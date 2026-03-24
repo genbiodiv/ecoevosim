@@ -112,6 +112,48 @@ const SplashPage: React.FC<SplashProps> = ({
             </motion.div>
           </header>
 
+          {/* Start Action - Moved before Evolutionary Mechanics */}
+          <motion.div 
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-col items-center space-y-8"
+          >
+            <div className="w-full max-w-md space-y-4">
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest opacity-60 text-center">
+                  {t('Simulation Duration (Generations)', 'Duración de la Simulación (Generaciones)')}
+                </label>
+                <div className="flex gap-2">
+                  {[5, 10, 20, 50].map((d) => (
+                    <button
+                      key={d}
+                      onClick={() => onSetChallengeDuration(d)}
+                      className={cn(
+                        "flex-1 py-3 border-2 border-black dark:border-white/20 font-mono font-bold text-sm transition-all",
+                        challengeDuration === d 
+                          ? "bg-black text-white dark:bg-white dark:text-black" 
+                          : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                      )}
+                    >
+                      {d}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => onStart()}
+              className="w-full py-8 bg-black dark:bg-white text-white dark:text-black text-2xl font-bold border-4 border-black dark:border-white hover:bg-white hover:text-black dark:hover:bg-zinc-900 dark:hover:text-white transition-all uppercase tracking-tighter font-mono"
+            >
+              {t('Begin Simulation', 'Comenzar Simulación')}
+            </button>
+            <p className="mt-4 text-black dark:text-white text-[10px] font-bold uppercase tracking-[0.5em] opacity-80">
+              {t('Evolution is waiting', 'La evolución está esperando')}
+            </p>
+          </motion.div>
+
           {/* Game Explanation Section */}
           <motion.section 
             initial={{ y: 20, opacity: 0 }}
@@ -209,7 +251,7 @@ const SplashPage: React.FC<SplashProps> = ({
           </motion.section>
 
           {/* Content Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20">
+          <div className="grid grid-cols-1 gap-12 md:gap-20">
             {/* How to Play */}
             <motion.section 
               initial={{ y: 20, opacity: 0 }}
@@ -227,7 +269,7 @@ const SplashPage: React.FC<SplashProps> = ({
                 </h2>
               </div>
               
-              <div className="space-y-8">
+              <div className="grid md:grid-cols-3 gap-8">
                 {[
                   {
                     num: '01',
@@ -256,118 +298,7 @@ const SplashPage: React.FC<SplashProps> = ({
                 ))}
               </div>
             </motion.section>
-
-            {/* Learning Challenges */}
-            <motion.section 
-              initial={{ y: 20, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.5 }}
-              className="space-y-8"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-black dark:bg-white flex items-center justify-center text-white dark:text-black">
-                  <Brain size={20} />
-                </div>
-                <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white uppercase tracking-tight font-mono">
-                  {t('Mastery Challenges', 'Desafíos de Maestría')}
-                </h2>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest opacity-60">
-                    {t('Challenge Duration (Generations)', 'Duración del Desafío (Generaciones)')}
-                  </label>
-                  <div className="flex gap-2">
-                    {[5, 10, 20, 50].map((d) => (
-                      <button
-                        key={d}
-                        onClick={() => onSetChallengeDuration(d)}
-                        className={cn(
-                          "flex-1 py-3 border-2 border-black dark:border-white/20 font-mono font-bold text-sm transition-all",
-                          challengeDuration === d 
-                            ? "bg-black text-white dark:bg-white dark:text-black" 
-                            : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                        )}
-                      >
-                        {d}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="grid gap-0 border-2 border-black dark:border-white/20">
-                {[
-                  {
-                    en: 'The Red Queen\'s Race: Maintain a stable population while Predation Pressure is > 0.8 for 20 generations.',
-                    es: 'La Carrera de la Reina Roja: Mantén una población estable con Presión de Depredación > 0.8 durante 20 generaciones.'
-                  },
-                  {
-                    en: 'Adaptive Radiation: Branch the tree into 3 distinct lineages (different colors) that survive a Bottleneck.',
-                    es: 'Radiación Adaptativa: Ramifica el árbol en 3 linajes distintos (diferentes colores) que sobrevivan a un Cuello de Botella.'
-                  },
-                  {
-                    en: 'Metabolic Efficiency: Evolve a population with Metabolism < 0.3 but Speed > 0.6 in a low-food environment.',
-                    es: 'Eficiencia Metabólica: Evoluciona una población con Metabolismo < 0.3 pero Velocidad > 0.6 en un entorno con poco alimento.'
-                  },
-                  {
-                    en: 'Specialist Niche: Evolve a population with Food Specialization > 0.8 that survives a resource shift.',
-                    es: 'Nicho Especialista: Evoluciona una población con Especialización Alimentaria > 0.8 que sobreviva a un cambio de recursos.'
-                  },
-                  {
-                    en: 'Survivor Strategy: Maintain a lineage with high Defense (>0.7) and low Metabolism (<0.4) through multiple catastrophes.',
-                    es: 'Estrategia de Sobreviviente: Mantén un linaje con alta Defensa (>0.7) y bajo Metabolismo (<0.4) a través de múltiples catástrofes.'
-                  },
-                  {
-                    en: 'Functional Synergy: Enable Eco-Dynamics and maintain a population with Food Specialization diversity > 0.3 for 30 generations.',
-                    es: 'Sinergia Funcional: Activa la Dinámica Ecológica y mantén una diversidad de Especialización Alimentaria > 0.3 durante 30 generaciones.'
-                  },
-                  {
-                    en: 'Time Architect: Reach generation 100 and use Time Travel to export a report from exactly generation 50.',
-                    es: 'Arquitecto del Tiempo: Llega a la generación 100 y usa el Viaje en el Tiempo para exportar un informe de la generación 50.'
-                  },
-                  {
-                    en: 'Symbiotic Master: Maintain a population with Eco-Dynamics active and Synergy Strength > 0.3 for 50 generations.',
-                    es: 'Maestro Simbiótico: Mantén una población con Dinámica Eco activa y Fuerza de Sinergia > 0.3 durante 50 generaciones.'
-                  },
-                  {
-                    en: 'Macro Vision: Evolve a tree where at least 5 distinct lineages (Macro view) survive a major catastrophe.',
-                    es: 'Visión Macro: Evoluciona un árbol donde al menos 5 linajes distintos (vista Macro) sobrevivan a una catástrofe.'
-                  }
-                ].map((challenge, i) => (
-                  <div 
-                    key={i} 
-                    className="flex gap-4 p-6 bg-white dark:bg-zinc-900 border border-black dark:border-white/10 transition-all hover:bg-zinc-50 dark:hover:bg-zinc-800"
-                  >
-                    <Zap className="text-black dark:text-white shrink-0 mt-1" size={18} />
-                    <p className="text-xs md:text-sm text-black dark:text-white font-mono leading-relaxed">
-                      {t(challenge.en, challenge.es)}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.section>
           </div>
-
-          {/* Footer Action */}
-          <motion.div 
-            initial={{ y: 40, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="pt-12 pb-24 flex flex-col items-center"
-          >
-            <button
-              onClick={() => onStart()}
-              className="w-full md:w-auto md:px-32 py-8 bg-black dark:bg-white text-white dark:text-black text-2xl font-bold border-4 border-black dark:border-white hover:bg-white hover:text-black dark:hover:bg-zinc-900 dark:hover:text-white transition-all uppercase tracking-tighter font-mono"
-            >
-              {t('Begin Simulation', 'Comenzar Simulación')}
-            </button>
-            <p className="mt-8 text-black dark:text-white text-[10px] font-bold uppercase tracking-[0.5em] opacity-80">
-              {t('Evolution is waiting', 'La evolución está esperando')}
-            </p>
-          </motion.div>
         </div>
       </motion.div>
     </div>
