@@ -45,6 +45,34 @@ const MacroView: React.FC<MacroViewProps> = ({ population, generation, language,
   const alivePopulation = population.filter(isAliveAtViewedGen);
   const totalLineages = population.length;
   const extinctCount = population.filter(o => !isAliveAtViewedGen(o) && o.generation <= generation).length;
+
+  // Taxonomic Diversity (Morphospecies based on trait clustering)
+  const species = new Set<string>();
+  alivePopulation.forEach(o => {
+    const key = Object.values(o.traits).map(v => (v as number).toFixed(1)).join('|');
+    species.add(key);
+  });
+  const taxonomicDiversity = species.size;
+
+  // Phylogenetic Diversity (Total branch length of living tree)
+  const calculatePD = () => {
+    const ancestorIds = new Set<string>();
+    const popMap = new Map<string, Organism>(population.map(o => [o.id, o]));
+    alivePopulation.forEach(node => {
+      let current: Organism | undefined = node;
+      while (current) {
+        if (ancestorIds.has(current.id)) break;
+        ancestorIds.add(current.id);
+        if (!current.parentId) break;
+        current = popMap.get(current.parentId);
+      }
+    });
+    return Array.from(ancestorIds).filter(id => {
+      const node = popMap.get(id);
+      return node && node.parentId !== null;
+    }).length;
+  };
+  const phylogeneticDiversity = calculatePD();
   
   // Calculate average offspring
   // We can count how many children each parent has
@@ -77,6 +105,7 @@ const MacroView: React.FC<MacroViewProps> = ({ population, generation, language,
     { name: t('Metabolism', 'Metabolismo'), value: alivePopulation.reduce((a, b) => a + b.traits.metabolism, 0) / Math.max(1, alivePopulation.length) },
     { name: t('Defense', 'Defensa'), value: alivePopulation.reduce((a, b) => a + b.traits.defense, 0) / Math.max(1, alivePopulation.length) },
     { name: t('Repro', 'Repro'), value: alivePopulation.reduce((a, b) => a + b.traits.reproductionRate, 0) / Math.max(1, alivePopulation.length) },
+    { name: t('Clutch', 'Camada'), value: alivePopulation.reduce((a, b) => a + b.traits.clutchSize, 0) / Math.max(1, alivePopulation.length) },
   ];
 
   const stats = [
@@ -87,22 +116,22 @@ const MacroView: React.FC<MacroViewProps> = ({ population, generation, language,
       desc: t('Currently living organisms.', 'Organismos vivos actualmente.')
     },
     { 
-      label: t('Total Lineages', 'Linajes Totales'), 
-      value: totalLineages, 
-      icon: <Activity className="text-green-500" />,
-      desc: t('Total unique organisms evolved.', 'Total de organismos únicos evolucionados.')
+      label: t('Taxonomic Diversity', 'Diversidad Taxonómica'), 
+      value: taxonomicDiversity, 
+      icon: <Activity className="text-orange-500" />,
+      desc: t('Number of distinct morphospecies.', 'Número de morfoespecies distintas.')
+    },
+    { 
+      label: t('Phylogenetic Diversity', 'Diversidad Filogenética'), 
+      value: phylogeneticDiversity, 
+      icon: <TrendingUp className="text-emerald-500" />,
+      desc: t('Total branch length of the living tree.', 'Longitud total de las ramas del árbol vivo.')
     },
     { 
       label: t('Extinct Branches', 'Ramas Extintas'), 
       value: extinctCount, 
       icon: <Skull className="text-red-500" />,
       desc: t('Organisms that failed to survive.', 'Organismos que no lograron sobrevivir.')
-    },
-    { 
-      label: t('Avg. Offspring', 'Promedio Crías'), 
-      value: avgOffspring, 
-      icon: <TrendingUp className="text-purple-500" />,
-      desc: t('Average children per parent.', 'Promedio de hijos por progenitor.')
     },
   ];
 

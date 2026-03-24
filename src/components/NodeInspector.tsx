@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { X, Info, Activity, Zap, Shield, Wind, Thermometer, Utensils, AlertTriangle } from 'lucide-react';
+import { X, Info, Activity, Zap, Shield, Wind, Thermometer, Utensils, AlertTriangle, Users } from 'lucide-react';
 import { Organism, Language } from '../types';
 import { CHALLENGES } from '../simulation/challenges';
 import { cn } from '../lib/utils';
@@ -20,6 +20,7 @@ const NodeInspector: React.FC<InspectorProps> = ({ organism, onClose, language }
     { icon: <Wind size={16} />, label: t('Metabolism', 'Metabolismo'), value: organism.traits.metabolism },
     { icon: <Shield size={16} />, label: t('Defense', 'Defensa'), value: organism.traits.defense },
     { icon: <Zap size={16} />, label: t('Reproduction', 'Reproducción'), value: organism.traits.reproductionRate },
+    { icon: <Users size={16} />, label: t('Clutch Size', 'Tamaño de Camada'), value: organism.traits.clutchSize },
     { icon: <Thermometer size={16} />, label: t('Temp Tolerance', 'Tol. Temperatura'), value: organism.traits.tempTolerance },
     { icon: <Utensils size={16} />, label: t('Food Spec.', 'Espec. Alimento'), value: organism.traits.foodSpecialization },
   ];

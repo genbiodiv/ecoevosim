@@ -80,6 +80,7 @@ const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
       'Metabolism', 
       'Defense', 
       'Reproduction', 
+      'ClutchSize',
       'TempTolerance', 
       'FoodSpec', 
       'IsAlive',
@@ -100,6 +101,7 @@ const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
         o.traits.metabolism.toFixed(3),
         o.traits.defense.toFixed(3),
         o.traits.reproductionRate.toFixed(3),
+        o.traits.clutchSize.toFixed(3),
         o.traits.tempTolerance.toFixed(3),
         o.traits.foodSpecialization.toFixed(3),
         o.isAlive,
@@ -146,6 +148,7 @@ ${t('## DATA DICTIONARY', '## DICCIONARIO DE DATOS')}
 - ${t('Metabolism: Energy consumption rate. High metabolism allows activity but risks starvation.', 'Metabolismo: Tasa de consumo de energía. El metabolismo alto permite actividad pero arriesga inanición.')}
 - ${t('Defense: Protective features. Reduces mortality from predation and outbreaks.', 'Defensa: Características protectoras. Reduce la mortalidad por depredación y brotes.')}
 - ${t('Reproduction Rate: Likelihood of producing offspring. High rates lead to population booms.', 'Tasa de Reproducción: Probabilidad de producir crías. Las tasas altas llevan a explosiones demográficas.')}
+- ${t('Clutch Size: Potential number of offspring per reproduction event (1-8).', 'Tamaño de Camada: Número potencial de crías por evento reproductivo (1-8).')}
 - ${t('Temp Tolerance: Ability to survive extreme heat or cold.', 'Tolerancia Temp: Capacidad de sobrevivir a calor o frío extremos.')}
 - ${t('Food Specialization: 0.0 (Generalist) to 1.0 (Specialist).', 'Especialización Alimentaria: 0.0 (Generalista) a 1.0 (Especialista).')}
 
@@ -346,8 +349,9 @@ ${t('End of Report', 'Fin del Informe')}
 
   const stats = [
     { label: t('Total Lineages', 'Linajes Totales'), value: population.length, icon: <Activity size={20} /> },
-    { label: t('Final Generation', 'Generación Final'), value: generation, icon: <TrendingUp size={20} /> },
-    { label: t('Peak Population', 'Población Máxima'), value: Math.max(...history.map(h => h.aliveCount), 0), icon: <Users size={20} /> },
+    { label: t('Taxonomic Diversity', 'Diversidad Taxonómica'), value: history[history.length - 1]?.taxonomicDiversity || 0, icon: <TrendingUp size={20} className="text-orange-500" /> },
+    { label: t('Phylogenetic Diversity', 'Diversidad Filogenética'), value: history[history.length - 1]?.phylogeneticDiversity || 0, icon: <Activity size={20} className="text-emerald-500" /> },
+    { label: t('Peak Population', 'Población Máxima'), value: Math.max(...history.map(h => h.aliveCount), 0), icon: <Users size={20} className="text-blue-500" /> },
   ];
 
   return (
@@ -489,7 +493,7 @@ ${t('End of Report', 'Fin del Informe')}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border border-black dark:border-white/20">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-0 border border-black dark:border-white/20">
             {stats.map((s, i) => (
               <div key={i} className="p-8 bg-white dark:bg-zinc-900 border border-black dark:border-white/20">
                 <div className="text-black dark:text-white mb-6">{s.icon}</div>
@@ -558,6 +562,50 @@ ${t('End of Report', 'Fin del Informe')}
                       dot={false} 
                     />
                   ))}
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="p-8 bg-white dark:bg-zinc-900 border border-black dark:border-white/20 h-[450px] min-h-0 min-w-0 lg:col-span-2">
+              <h3 className="text-xs font-bold uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
+                <TrendingUp size={16} />
+                {t('Diversity Indices', 'Índices de Diversidad')}
+              </h3>
+              <ResponsiveContainer width="100%" height="100%" debounce={100}>
+                <LineChart data={history}>
+                  <CartesianGrid strokeDasharray="0" stroke={theme === 'dark' ? '#222' : '#eee'} vertical={false} />
+                  <XAxis dataKey="generation" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
+                  <YAxis yId="left" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
+                  <YAxis yId="right" orientation="right" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: theme === 'dark' ? '#18181b' : '#fff',
+                      border: theme === 'dark' ? '2px solid #3f3f46' : '2px solid #888',
+                      borderRadius: '0px',
+                      padding: '12px',
+                      fontFamily: 'monospace',
+                      color: theme === 'dark' ? '#fff' : '#000'
+                    }} 
+                  />
+                  <Legend iconType="square" wrapperStyle={{ paddingTop: '20px', fontSize: '9px', textTransform: 'uppercase', fontWeight: 'bold' }} />
+                  <Line 
+                    yId="left"
+                    type="monotone" 
+                    dataKey="taxonomicDiversity" 
+                    name={t('Taxonomic Diversity', 'Diversidad Taxonómica')} 
+                    stroke="#f59e0b" 
+                    strokeWidth={3} 
+                    dot={false} 
+                  />
+                  <Line 
+                    yId="right"
+                    type="monotone" 
+                    dataKey="phylogeneticDiversity" 
+                    name={t('Phylogenetic Diversity', 'Diversidad Filogenética')} 
+                    stroke="#10b981" 
+                    strokeWidth={3} 
+                    dot={false} 
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -642,6 +690,7 @@ ${t('End of Report', 'Fin del Informe')}
                 { label: t('Metabolism', 'Metabolismo'), desc: t('Energy consumption. Low metabolism survives famines.', 'Consumo de energía. El metabolismo bajo sobrevive a hambrunas.') },
                 { label: t('Defense', 'Defensa'), desc: t('Protection against predators and diseases.', 'Protección contra depredadores y enfermedades.') },
                 { label: t('Reproduction', 'Reproducción'), desc: t('Likelihood of offspring. Drives population growth.', 'Probabilidad de crías. Impulsa el crecimiento poblacional.') },
+                { label: t('Clutch Size', 'Tamaño de Camada'), desc: t('Potential number of offspring per event (1-8).', 'Número potencial de crías por evento (1-8).') },
                 { label: t('Temp Tolerance', 'Tolerancia Temp'), desc: t('Survival in extreme climate shifts.', 'Supervivencia en cambios climáticos extremos.') },
               ].map((item, i) => (
                 <div key={i} className="space-y-2">

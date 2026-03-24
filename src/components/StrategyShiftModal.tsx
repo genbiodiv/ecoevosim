@@ -60,12 +60,11 @@ const StrategyShiftModal: React.FC<StrategyShiftModalProps> = ({
       id: 'boom',
       nameEn: 'Population Boom',
       nameEs: 'Explosión Demográfica',
-      descEn: 'Maximize offspring, but significantly higher mortality.',
-      descEs: 'Maximizar crías, pero mortalidad significativamente mayor.',
+      descEn: 'Maximize potential, but significantly higher mortality.',
+      descEs: 'Maximizar potencial, pero mortalidad significativamente mayor.',
       icon: <Users className="text-emerald-500" />,
       apply: (s: SimulationSettings) => ({
         ...s,
-        offspringNumber: Math.min(10, s.offspringNumber + 2),
         intrinsicMortality: Math.min(0.5, s.intrinsicMortality + 0.1)
       })
     },
@@ -73,12 +72,11 @@ const StrategyShiftModal: React.FC<StrategyShiftModalProps> = ({
       id: 'efficiency',
       nameEn: 'Resource Efficiency',
       nameEs: 'Eficiencia de Recursos',
-      descEn: 'Fewer offspring, but much higher individual survival.',
-      descEs: 'Menos crías, pero supervivencia individual mucho mayor.',
+      descEn: 'Focus on individual survival over quantity.',
+      descEs: 'Enfocarse en la supervivencia individual sobre la cantidad.',
       icon: <Leaf className="text-indigo-500" />,
       apply: (s: SimulationSettings) => ({
         ...s,
-        offspringNumber: Math.max(1, s.offspringNumber - 1),
         intrinsicMortality: Math.max(0.02, s.intrinsicMortality - 0.08)
       })
     },
@@ -99,13 +97,13 @@ const StrategyShiftModal: React.FC<StrategyShiftModalProps> = ({
       id: 'hardy',
       nameEn: 'Hardy Lineage',
       nameEs: 'Linaje Resistente',
-      descEn: 'Extreme survival focus with minimal reproduction.',
-      descEs: 'Enfoque de supervivencia extrema con reproducción mínima.',
+      descEn: 'Extreme survival focus with minimal mutation.',
+      descEs: 'Enfoque de supervivencia extrema con mutación mínima.',
       icon: <Shield className="text-slate-500" />,
       apply: (s: SimulationSettings) => ({
         ...s,
         intrinsicMortality: Math.max(0.01, s.intrinsicMortality - 0.12),
-        offspringNumber: Math.max(1, s.offspringNumber - 2)
+        mutationRate: Math.max(0.01, s.mutationRate - 0.02)
       })
     },
     {

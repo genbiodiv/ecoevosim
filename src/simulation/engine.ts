@@ -11,6 +11,7 @@ export const createInitialOrganism = (): Organism => ({
     metabolism: 0.5,
     defense: 0.5,
     reproductionRate: 0.6,
+    clutchSize: 0.4,
     tempTolerance: 0.5,
     foodSpecialization: 0.5,
   },
@@ -32,6 +33,7 @@ export const mutateTraits = (parentTraits: Traits, settings: SimulationSettings)
     metabolism: mutate(parentTraits.metabolism),
     defense: mutate(parentTraits.defense),
     reproductionRate: mutate(parentTraits.reproductionRate),
+    clutchSize: mutate(parentTraits.clutchSize),
     tempTolerance: mutate(parentTraits.tempTolerance),
     foodSpecialization: mutate(parentTraits.foodSpecialization),
   };
@@ -153,12 +155,13 @@ export const runGeneration = (
   const finalPopulation = updatedPopulation.map(org => {
     if (!org.isAlive || org.generation !== generation) return org;
     
-    // Probabilistic reproduction: reproductionRate defines the mean
+    // Probabilistic reproduction: reproductionRate defines the probability per trial
+    // clutchSize defines the number of trials (potential offspring)
     // Reproduction is throttled by overcrowding to help stabilize population size
     let numOffspring = 0;
-    const maxTrials = 4;
+    const maxTrials = Math.floor(1 + org.traits.clutchSize * 7); // 1 to 8 potential offspring
     const reproductionThrottle = 1 / (1 + overcrowdingFactor * 2);
-    const p = (org.traits.reproductionRate * settings.offspringNumber * reproductionThrottle) / maxTrials;
+    const p = org.traits.reproductionRate * reproductionThrottle;
     
     for (let i = 0; i < maxTrials; i++) {
       if (Math.random() < p) {

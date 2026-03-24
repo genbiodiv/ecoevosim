@@ -21,13 +21,16 @@ export const getOrganismColor = (traits: Traits): string => {
   return `rgb(${r}, ${g}, ${b})`;
 };
 
-export const getTraitLegend = () => [
-  { label: 'Red: Size & Defense', color: 'rgb(255, 0, 0)' },
-  { label: 'Green: Speed & Reproduction', color: 'rgb(0, 255, 0)' },
-  { label: 'Blue: Metabolism & Resilience', color: 'rgb(0, 0, 255)' },
-  { label: 'Yellow: Size + Speed (Agile Giants)', color: 'rgb(255, 255, 0)' },
-  { label: 'Cyan: Speed + Metabolism (Fast Burners)', color: 'rgb(0, 255, 255)' },
-  { label: 'Magenta: Size + Metabolism (Tough Tanks)', color: 'rgb(255, 0, 255)' },
-  { label: 'White: Balanced Generalist', color: 'rgb(255, 255, 255)' },
-  { label: 'Mixed: Evolutionary Strategy', color: 'linear-gradient(to right, red, green, blue)' },
-];
+export const getTraitLegend = (language: 'EN' | 'ES' = 'EN') => {
+  const t = (en: string, es: string) => language === 'EN' ? en : es;
+  return [
+    { label: t('Red: Size & Defense', 'Rojo: Tamaño y Defensa'), color: 'rgb(255, 0, 0)' },
+    { label: t('Green: Speed & Reproduction', 'Verde: Velocidad y Reproducción'), color: 'rgb(0, 255, 0)' },
+    { label: t('Blue: Metabolism & Resilience', 'Azul: Metabolismo y Resiliencia'), color: 'rgb(0, 0, 255)' },
+    { label: t('Yellow: Size + Speed (Agile Giants)', 'Amarillo: Tamaño + Velocidad (Gigantes Ágiles)'), color: 'rgb(255, 255, 0)' },
+    { label: t('Cyan: Speed + Metabolism (Fast Burners)', 'Cian: Velocidad + Metabolismo (Quemadores Rápidos)'), color: 'rgb(0, 255, 255)' },
+    { label: t('Magenta: Size + Metabolism (Tough Tanks)', 'Magenta: Tamaño + Metabolismo (Tanques Resistentes)'), color: 'rgb(255, 0, 255)' },
+    { label: t('White: Balanced Generalist', 'Blanco: Generalista Equilibrado'), color: 'rgb(255, 255, 255)' },
+    { label: t('Mixed: Evolutionary Strategy', 'Mezclado: Estrategia Evolutiva'), color: 'linear-gradient(to right, red, green, blue)' },
+  ];
+};

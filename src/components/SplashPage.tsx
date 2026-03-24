@@ -31,7 +31,7 @@ const SplashPage: React.FC<SplashProps> = ({
 }) => {
   const t = (en: string, es: string) => language === Language.EN ? en : es;
   const challengesRef = useRef<HTMLDivElement>(null);
-  const legend = getTraitLegend();
+  const legend = getTraitLegend(language);
 
   const scrollToChallenges = () => {
     challengesRef.current?.scrollIntoView({ behavior: 'smooth' });

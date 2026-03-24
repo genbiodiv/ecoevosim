@@ -9,6 +9,7 @@ export interface Traits {
   metabolism: number;
   defense: number;
   reproductionRate: number;
+  clutchSize: number; // 0 to 1 (maps to number of offspring)
   tempTolerance: number;
   foodSpecialization: number; // 0 to 1 (e.g., 0 = plants, 1 = meat)
 }
@@ -55,7 +56,6 @@ export interface SimulationSettings {
   mutationRate: number;
   mutationEffect: number;
   intrinsicMortality: number;
-  offspringNumber: number;
   predationPressure: number;
   foodAvailability: number;
   instability: number;
@@ -75,6 +75,8 @@ export interface GenerationMetrics {
   avgSpeed: number;
   avgMetabolism: number;
   strategies: Record<string, number>;
+  taxonomicDiversity: number;
+  phylogeneticDiversity: number;
 }
 
 export enum StrategyType {

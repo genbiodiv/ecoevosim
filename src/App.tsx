@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
+  Organism,
   SimulationState, 
   Language, 
   SimulationSettings, 
@@ -29,7 +30,6 @@ const INITIAL_SETTINGS: SimulationSettings = {
   mutationRate: 0.05,
   mutationEffect: 0.1,
   intrinsicMortality: 0.15,
-  offspringNumber: 4,
   predationPressure: 0.3,
   foodAvailability: 0.5,
   instability: 0.2,
@@ -63,9 +63,9 @@ export default function App() {
     lastShiftGen: -1,
     language: Language.ES,
     theme: 'light',
-    view: SimulationView.MACRO,
+    view: SimulationView.TREE,
     hideExtinct: false,
-    isMacroView: false,
+    isMacroView: true,
     isLargeTreeWarningDismissed: false,
     showManualStrategy: false,
     isExtinctionAlertDismissed: false,
@@ -172,6 +172,31 @@ export default function App() {
           strategyCounts[strategy] = (strategyCounts[strategy] || 0) + 1;
         });
 
+        // Calculate Taxonomic Diversity (Morphospecies based on trait clustering)
+        const species = new Set<string>();
+        aliveNodes.forEach(o => {
+          const key = Object.values(o.traits).map(v => (v as number).toFixed(1)).join('|');
+          species.add(key);
+        });
+        const taxonomicDiversity = species.size;
+
+        // Calculate Phylogenetic Diversity (Total branch length of living tree)
+        const ancestorIds = new Set<string>();
+        const popMap = new Map<string, Organism>(prunedPopulation.map(o => [o.id, o]));
+        aliveNodes.forEach(node => {
+          let current: Organism | undefined = node;
+          while (current) {
+            if (ancestorIds.has(current.id)) break;
+            ancestorIds.add(current.id);
+            if (!current.parentId) break;
+            current = popMap.get(current.parentId);
+          }
+        });
+        const phylogeneticDiversity = Array.from(ancestorIds).filter(id => {
+          const node = popMap.get(id);
+          return node && node.parentId !== null;
+        }).length;
+
         const newMetrics = {
           generation: nextGen,
           aliveCount,
@@ -179,6 +204,8 @@ export default function App() {
           avgSpeed: aliveNodes.reduce((acc, o) => acc + o.traits.speed, 0) / Math.max(1, aliveCount),
           avgMetabolism: aliveNodes.reduce((acc, o) => acc + o.traits.metabolism, 0) / Math.max(1, aliveCount),
           strategies: strategyCounts,
+          taxonomicDiversity,
+          phylogeneticDiversity,
         };
 
         if (aliveCount === 0 && nextPopulation.length > 0) {
@@ -230,7 +257,7 @@ export default function App() {
       generation: 0,
       population: [createInitialOrganism()],
       history: [],
-      isPaused: false,
+      isPaused: true,
       isGameOver: false,
       isSimulationComplete: false,
       stopReason: null,
@@ -271,7 +298,7 @@ export default function App() {
     return state.history.filter(h => h.generation <= state.viewedGeneration);
   }, [state.history, state.viewedGeneration, state.generation]);
 
-  const legend = getTraitLegend();
+  const legend = getTraitLegend(state.language);
 
   // Sync theme with document element for Tailwind dark mode
   useEffect(() => {
@@ -289,7 +316,7 @@ export default function App() {
           <SplashPage
             onStart={() => {
               setShowSplash(false);
-              setState(s => ({ ...s, isPaused: false }));
+              setState(s => ({ ...s, isPaused: true }));
             }}
             language={state.language}
             onToggleLanguage={() => setState(s => ({ ...s, language: s.language === Language.EN ? Language.ES : Language.EN }))}

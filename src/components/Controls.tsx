@@ -65,12 +65,6 @@ const Controls: React.FC<ControlsProps> = ({
       def: t('Base probability of death regardless of environment.', 'Probabilidad base de muerte independientemente del entorno.')
     },
     { 
-      key: 'offspringNumber', 
-      label: t('Offspring Number', 'Número de Crías'), 
-      min: 1, max: 10, step: 1,
-      def: t('Number of children produced by each survivor.', 'Número de hijos producidos por cada sobreviviente.')
-    },
-    { 
       key: 'predationPressure', 
       label: t('Predation Pressure', 'Presión de Depredación'), 
       min: 0, max: 1, step: 0.05,
