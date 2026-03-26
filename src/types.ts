@@ -66,6 +66,7 @@ export interface SimulationSettings {
   challengeDuration: number;
   ecoSynergy: boolean;
   synergyStrength: number;
+  baseOffspring: number;
 }
 
 export interface GenerationMetrics {

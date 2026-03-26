@@ -159,7 +159,7 @@ export const runGeneration = (
     // clutchSize defines the number of trials (potential offspring)
     // Reproduction is throttled by overcrowding to help stabilize population size
     let numOffspring = 0;
-    const maxTrials = Math.floor(1 + org.traits.clutchSize * 7); // 1 to 8 potential offspring
+    const maxTrials = Math.floor(1 + org.traits.clutchSize * settings.baseOffspring); // 1 to baseOffspring+1 potential offspring
     const reproductionThrottle = 1 / (1 + overcrowdingFactor * 2);
     const p = org.traits.reproductionRate * reproductionThrottle;
     

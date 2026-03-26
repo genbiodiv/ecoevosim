@@ -2,42 +2,65 @@
 
 A high-fidelity biological evolution simulator that models natural selection, genetic mutation, and phylogenetic branching in real-time.
 
-## 🧬 Core Concept
+## 🧬 Core Concepts
 
-ECO EVO SIM allows you to observe and manipulate the fundamental processes of life. Every organism in the population possesses a unique set of traits (Size, Speed, Metabolism, Defense, etc.) that determine its fitness within a dynamic environment.
+### 1. Biological Traits
+Every organism in ECO EVO SIM is defined by a set of quantitative traits (0.0 to 1.0) that determine its fitness:
+- **Size**: Influences food requirements and predation risk. Larger organisms need more food but are harder to prey upon and resist cold better.
+- **Speed**: Affects the ability to escape predators and find food. Higher speed increases survival but consumes more energy.
+- **Metabolism**: Determines how efficiently an organism uses energy. High metabolism allows for faster movement and reproduction but requires constant food.
+- **Defense**: Physical or behavioral protections against predation (e.g., shells, camouflage).
+- **Reproduction Rate**: The probability of producing offspring in a given generation.
+- **Clutch Size**: The potential number of offspring (1-8) per reproduction event.
+- **Temp Tolerance**: Ability to survive extreme heat or cold.
+- **Food Specialization**: Generalists (0.0) can eat anything but are less efficient; Specialists (1.0) are highly efficient but restricted to specific food types.
 
-## 🚀 Key Features
+### 2. Environmental Pressures
+The environment is dynamic and exerts constant pressure:
+- **Predation**: High predation favors organisms with high Speed or Defense.
+- **Food Availability**: Scarcity favors low Metabolism or small Size.
+- **Temperature**: Extreme temperatures favor specialized "Hardy" traits. Cold favors large size; Heat favors small size.
+- **Instability**: The rate at which environmental conditions change. High instability favors generalists.
+- **Carrying Capacity**: Limits the total population size, leading to intense competition and bottlenecks.
+
+### 3. Evolutionary Strategies
+Lineages can pivot their focus through periodic "Strategy Shifts":
+- **Symbiosis**: Increases survival through cooperation. Works best in diverse populations (Eco-Dynamics).
+- **Hardiness**: Boosts resistance to environmental extremes and food scarcity.
+- **Evasion**: Maximizes Speed and camouflage to avoid predation.
+- **Generalist**: A balanced approach that avoids extreme specialization, providing resilience to unpredictable changes.
+
+### 4. Eco-Dynamics & Functional Synergy
+When **Eco-Dynamics** is enabled, the simulation models ecosystem health:
+- **Functional Synergy**: A diverse population (filling multiple niches) provides a survival boost to specialized organisms. This represents a stable, co-evolved food web where different species support each other's existence.
+
+## 🚀 Key Facilities
 
 ### 1. Multi-Scale Visualization
-- **Phylogeny View:** A real-time branching tree showing the full history of life. Toggle between **Macroevolution** (surviving lineages) and **Microevolution** (all individuals).
+- **Phylogeny View (The Tree):** A real-time branching tree showing the full history of life. 
+  - **Macroevolution Mode:** Shows only the lineages that have surviving descendants.
+  - **Microevolution Mode:** Shows every single individual that ever lived.
 - **Population View:** A spatial representation of the current living generation, showing individual traits and interactions.
-- **Macro View:** High-level metrics and strategy distribution across the entire history of the simulation.
+- **Macro View:** High-level metrics, diversity indices, and strategy distribution across the entire history.
 
-### 2. Evolutionary Mechanics
-- **Natural Selection:** Environmental filters (Predation, Food, Temperature) determine which organisms survive to reproduce.
-- **Genetic Mutation:** Offspring inherit traits with random variations, leading to the emergence of new biological strategies.
-- **Speciation:** Over time, isolated lineages diverge into distinct groups, visualized as branches on the phylogenetic tree.
+### 2. Analytical Tools
+- **Node Inspector:** Click any node in the tree to see its exact traits, its parents, and why it survived or went extinct.
+- **Diversity Indices:** Track **Taxonomic Diversity** (number of distinct groups) and **Phylogenetic Diversity** (total branch length of the tree) in real-time.
+- **Time Travel:** Use the history scrubber in the Evaluation Panel to revisit any point in your evolutionary timeline and see the state of the world at that moment.
 
-### 3. Eco-Dynamics & Functional Synergy
-- **Eco-Dynamics Mode:** When enabled, the simulation models ecosystem health.
-- **Functional Synergy:** Diverse populations (filling multiple niches) provide a survival boost to specialized organisms, representing a stable, co-evolved food web.
-
-### 4. Interactive Challenges
-- **Mastery Challenges:** Specific goals like "The Red Queen's Race" or "Adaptive Radiation" that test your ability to guide evolution through extreme conditions.
-- **Strategy Shifts:** Periodic opportunities to pivot your evolutionary focus (e.g., "Hardy Lineage" vs. "Symbiotic Ecosystem").
-
-## 🛠 Tech Stack
-- **Frontend:** React 18, TypeScript, Vite
-- **Styling:** Tailwind CSS (Minimalist/High-Contrast Design)
-- **Animations:** Motion (Framer Motion)
-- **Visualization:** D3.js (Phylogeny Tree), Recharts (Analytics)
-- **Icons:** Lucide React
+### 3. Data Export & Interoperability
+ECO EVO SIM is designed for research and education:
+- **High-Res Images:** Export the current tree or population view as a PNG.
+- **CSV Data:** Download raw population metrics for external analysis in Excel or R.
+- **Newick Tree Files:** Export the phylogeny in the standard Newick format used by professional bioinformatics tools.
+- **PDF Reports:** Generate a comprehensive summary of your simulation, including charts, top strategies, and evolutionary milestones.
 
 ## 🎮 How to Play
-1. **Observe:** Watch the tree grow and lineages diverge.
-2. **Adjust:** Use the Settings panel to change mutation rates, environmental pressures, and carrying capacity.
-3. **Analyze:** Use the Node Inspector to see why specific organisms survived or went extinct.
-4. **Export:** Download CSV data, Newick tree files, or detailed PDF reports of your evolutionary journey.
+1. **Begin:** Start a new simulation from the Splash Page.
+2. **Observe:** Watch the tree grow from left to right. Circles are living; X marks are extinct.
+3. **Interact:** Adjust mutation rates and environmental pressures in the Controls panel.
+4. **Pivot:** When prompted, choose a new Evolutionary Strategy to guide your lineage.
+5. **Analyze:** Use the Evaluation Panel to review the full history of your world.
 
 ---
 *Evolution is a journey of a billion small steps. Start yours today.*

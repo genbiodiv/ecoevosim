@@ -40,6 +40,7 @@ const INITIAL_SETTINGS: SimulationSettings = {
   challengeDuration: 10,
   ecoSynergy: true,
   synergyStrength: 0.15,
+  baseOffspring: 7,
 };
 
 export default function App() {
@@ -80,11 +81,14 @@ export default function App() {
   useEffect(() => {
     if (state.isPaused || showSplash || state.isGameOver) return;
 
+    let isActive = true;
     let timeoutId: NodeJS.Timeout;
 
     const tick = () => {
+      if (!isActive) return;
+
       setState(prev => {
-        if (prev.isPaused || prev.isGameOver) return prev;
+        if (!isActive || prev.isPaused || prev.isGameOver) return prev;
 
         const nextGen = prev.generation + 1;
         const challenge = getChallengeForGeneration(nextGen, prev.settings.isInfinite, prev.settings.challengeDuration);
@@ -235,12 +239,17 @@ export default function App() {
         };
       });
 
-      timeoutId = setTimeout(tick, 1000);
+      if (isActive) {
+        timeoutId = setTimeout(tick, 1000);
+      }
     };
 
     timeoutId = setTimeout(tick, 1000);
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      isActive = false;
+      clearTimeout(timeoutId);
+    };
   }, [state.isPaused, showSplash, state.isGameOver, isHighRes]);
 
   const t = (en: string, es: string) => state.language === Language.EN ? en : es;

@@ -100,6 +100,12 @@ const Controls: React.FC<ControlsProps> = ({
       min: 0, max: 0.5, step: 0.01,
       def: t('Strength of functional support between diverse groups.', 'Fuerza del apoyo funcional entre grupos diversos.')
     },
+    { 
+      key: 'baseOffspring', 
+      label: t('Avg. Offspring', 'Descendencia Prom.'), 
+      min: 1, max: 20, step: 1,
+      def: t('Potential number of offspring per generation.', 'Número potencial de descendientes por generación.')
+    },
   ];
 
   return (

@@ -188,24 +188,111 @@ const SplashPage: React.FC<SplashProps> = ({
                   className="overflow-hidden"
                 >
                   <div className="grid md:grid-cols-2 gap-12 py-8 border-t-2 border-black dark:border-white/20 mt-8">
-                    <div className="space-y-6">
-                      <h3 className="text-xl font-bold uppercase tracking-tighter font-mono">{t('Understanding the Tree', 'Entendiendo el Árbol')}</h3>
-                      <div className="space-y-4 text-sm font-mono leading-relaxed opacity-80">
-                        <p>{t('The tree grows from left to right. Each node represents an organism.', 'El árbol crece de izquierda a derecha. Cada nodo representa un organismo.')}</p>
-                        <p>{t('Lines connect parents to offspring. The color of the line and node represents the genetic traits of that individual.', 'Las líneas conectan a los padres con sus crías. El color representa los rasgos genéticos.')}</p>
-                        <p>{t('Circles indicate living organisms, while X marks represent extinct lineages.', 'Los círculos indican organismos vivos, mientras que las X representan linajes extintos.')}</p>
-                        <p>{t('Use the MACRO/MICRO toggle (M/m) to switch between the full history and the surviving lineages.', 'Usa el toggle MACRO/MICRO (M/m) para cambiar entre la historia completa y los linajes sobrevivientes.')}</p>
-                        <p>{t('Time Travel: Use the history scrubber in the Evaluation Panel to revisit any point in your evolutionary timeline.', 'Viaje en el Tiempo: Usa el desplazador de historia en el Panel de Evaluación para revisar cualquier punto de tu línea temporal.')}</p>
+                      <div className="space-y-4">
+                        <h3 className="text-xl font-bold uppercase tracking-tighter font-mono flex items-center gap-2">
+                          <CheckCircle2 size={20} className="text-green-500" />
+                          {t('Core Simulation & Traits', 'Simulación Central y Rasgos')}
+                        </h3>
+                        <div className="space-y-4 text-sm font-mono leading-relaxed opacity-80">
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Size (0.0 - 1.0):', 'Tamaño (0.0 - 1.0):')}</span>
+                            {" "}{t('Physical scale. Larger organisms resist cold better but require significantly more food to survive each generation.', 'Escala física. Los organismos grandes resisten mejor el frío pero requieren significativamente más comida.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Speed (0.0 - 1.0):', 'Velocidad (0.0 - 1.0):')}</span>
+                            {" "}{t('Movement velocity. Essential for escaping predators and reaching food sources before competitors.', 'Velocidad de movimiento. Esencial para escapar de depredadores y alcanzar comida antes que los competidores.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Metabolism (0.0 - 1.0):', 'Metabolismo (0.0 - 1.0):')}</span>
+                            {" "}{t('Energy consumption rate. High metabolism allows for more activity but increases the risk of starvation during food shortages.', 'Tasa de consumo de energía. El metabolismo alto permite más actividad pero aumenta el riesgo de inanición.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Defense (0.0 - 1.0):', 'Defensa (0.0 - 1.0):')}</span>
+                            {" "}{t('Protective features like shells or camouflage. Reduces mortality from predation and environmental outbreaks.', 'Características protectoras como caparazones o camuflaje. Reduce la mortalidad por depredación.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Reproduction Rate (0.0 - 1.0):', 'Tasa de Reproducción (0.0 - 1.0):')}</span>
+                            {" "}{t('Likelihood of producing offspring. High rates lead to population booms but can cause rapid resource depletion.', 'Probabilidad de producir crías. Las tasas altas llevan a explosiones demográficas.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Clutch Size (1 - 8):', 'Tamaño de Camada (1 - 8):')}</span>
+                            {" "}{t('The number of offspring per reproduction event. Essential for recovering from mass extinction events.', 'El número de crías por evento reproductivo. Esencial para recuperarse de extinciones masivas.')}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <h3 className="text-xl font-bold uppercase tracking-tighter font-mono flex items-center gap-2">
+                          <Globe size={20} className="text-purple-500" />
+                          {t('Environmental Pressures', 'Presiones Ambientales')}
+                        </h3>
+                        <div className="space-y-4 text-sm font-mono leading-relaxed opacity-80">
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Temperature:', 'Temperatura:')}</span>
+                            {" "}{t('Fluctuates over time. Extreme heat or cold requires high Temp Tolerance. Large size helps in cold; small size in heat.', 'Fluctúa con el tiempo. El calor o frío extremos requieren alta Tolerancia Temp.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Food Availability:', 'Disponibilidad de Comida:')}</span>
+                            {" "}{t('Determines the carrying capacity of the ecosystem. Low food favors small, low-metabolism organisms.', 'Determina la capacidad de carga del ecosistema. Poca comida favorece organismos pequeños.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Predation Pressure:', 'Presión de Depredación:')}</span>
+                            {" "}{t('High pressure forces the evolution of Speed and Defense. Slow, unprotected lineages quickly go extinct.', 'La alta presión fuerza la evolución de Velocidad y Defensa.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Instability:', 'Inestabilidad:')}</span>
+                            {" "}{t('The rate of environmental change. High instability favors generalists who can adapt to rapid shifts.', 'La tasa de cambio ambiental. La alta inestabilidad favorece a los generalistas.')}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                    <div className="space-y-6">
-                      <h3 className="text-xl font-bold uppercase tracking-tighter font-mono">{t('Advanced Dynamics', 'Dinámicas Avanzadas')}</h3>
-                      <div className="space-y-4 text-sm font-mono leading-relaxed opacity-80">
-                        <p>{t('Strategy Shifts: Periodically, you can pivot your lineage\'s focus (e.g., Symbiosis, Hardiness, or Evasion).', 'Cambios de Estrategia: Periódicamente, puedes pivotar el enfoque de tu linaje (ej. Simbiosis, Resistencia o Evasión).')}</p>
-                        <p>{t('Eco-Dynamics: When enabled, diverse populations create functional synergies. Specialized organisms support each other, increasing overall survival.', 'Dinámica Ecológica: Cuando está activa, las poblaciones diversas crean sinergias funcionales. Los organismos especializados se apoyan, aumentando la supervivencia general.')}</p>
-                        <p>{t('Data Export: Save your progress as high-resolution images, CSV data, Newick tree files, or detailed PDF reports.', 'Exportación de Datos: Guarda tu progreso como imágenes de alta resolución, datos CSV, archivos de árbol Newick o informes PDF detallados.')}</p>
+
+                    <div className="space-y-8">
+                      <div className="space-y-4">
+                        <h3 className="text-xl font-bold uppercase tracking-tighter font-mono flex items-center gap-2">
+                          <Zap size={20} className="text-yellow-500" />
+                          {t('Evolutionary Strategies', 'Estrategias Evolutivas')}
+                        </h3>
+                        <div className="space-y-4 text-sm font-mono leading-relaxed opacity-80">
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Symbiosis:', 'Simbiosis:')}</span>
+                            {" "}{t('Focuses on cooperation and ecological niche sharing. Highly effective when Eco-Dynamics are active and population diversity is high.', 'Se enfoca en la cooperación y el intercambio de nichos. Muy efectivo con alta diversidad.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Hardiness:', 'Resistencia:')}</span>
+                            {" "}{t('Maximizes survival in harsh environments with low food and extreme temperatures. Prioritizes metabolic efficiency.', 'Maximiza la supervivencia en entornos hostiles. Prioriza la eficiencia metabólica.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Evasion:', 'Evasión:')}</span>
+                            {" "}{t('Prioritizes speed and camouflage to minimize losses from predation. Ideal for high-pressure environments.', 'Prioriza la velocidad y el camuflaje para minimizar pérdidas por depredación.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Generalist:', 'Generalista:')}</span>
+                            {" "}{t('A balanced approach that avoids extreme specialization, allowing the lineage to survive diverse challenges.', 'Un enfoque equilibrado que evita la especialización extrema.')}
+                          </p>
+                        </div>
                       </div>
-                    </div>
+
+                      <div className="space-y-4">
+                        <h3 className="text-xl font-bold uppercase tracking-tighter font-mono flex items-center gap-2">
+                          <Brain size={20} className="text-blue-500" />
+                          {t('Advanced Facilities', 'Facilidades Avanzadas')}
+                        </h3>
+                        <div className="space-y-4 text-sm font-mono leading-relaxed opacity-80">
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Eco-Dynamics:', 'Dinámica Ecológica:')}</span>
+                            {" "}{t('Models ecosystem synergy. Diverse populations provide a "Functional Synergy" bonus, helping specialized organisms survive.', 'Modela la sinergia del ecosistema. Poblaciones diversas dan un bono de supervivencia.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Time Travel:', 'Viaje en el Tiempo:')}</span>
+                            {" "}{t('Use the history scrubber in the Evaluation Panel to revisit any previous generation. The tree and metrics will update to reflect that specific moment.', 'Usa el desplazador de historia para revisar cualquier generación previa.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Newick Export:', 'Exportación Newick:')}</span>
+                            {" "}{t('Export your tree in standard format. Choose between Micro (all individuals) or Macro (only surviving lineages) modes.', 'Exporta tu árbol en formato estándar. Elige entre modo Micro o Macro.')}
+                          </p>
+                        </div>
+                      </div>
                   </div>
                 </motion.div>
               )}

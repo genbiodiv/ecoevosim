@@ -57,6 +57,9 @@ const EvaluationPanel: React.FC<EvaluationPanelProps> = ({
   challengeDuration
 }) => {
   const [targetGeneration, setTargetGeneration] = React.useState(maxGeneration);
+  const [showNewickModal, setShowNewickModal] = React.useState(false);
+  const [newickGen, setNewickGen] = React.useState(maxGeneration);
+  const [newickMode, setNewickMode] = React.useState<'macro' | 'micro'>('macro');
   const panelRef = useRef<HTMLDivElement>(null);
   const t = (en: string, es: string) => language === Language.EN ? en : es;
 
@@ -203,13 +206,34 @@ ${t('End of Report', 'Fin del Informe')}
   const STRATEGY_COLORS = ['#3b82f6', '#22c55e', '#ef4444', '#a855f7', '#f59e0b', '#06b6d4', '#ec4899'];
 
   const downloadNewick = () => {
+    const exportPopulation = fullPopulation.filter(o => o.generation <= newickGen);
+    
+    let displayPopulation = exportPopulation;
+    if (newickMode === 'macro') {
+      const aliveIds = new Set<string>(exportPopulation.filter(o => o.isAlive && o.generation === newickGen).map(o => o.id));
+      const hasLivingDescendant = new Set<string>();
+      const idToParent = new Map<string, string | null>();
+      exportPopulation.forEach(o => idToParent.set(o.id, o.parentId));
+
+      aliveIds.forEach((id: string) => {
+        let current: string | null = id;
+        while (current) {
+          if (hasLivingDescendant.has(current)) break;
+          hasLivingDescendant.add(current);
+          const parentId: string | null | undefined = idToParent.get(current);
+          current = parentId || null;
+        }
+      });
+      displayPopulation = exportPopulation.filter(o => o.isAlive || hasLivingDescendant.has(o.id));
+    }
+
     const toNewick = (nodes: Organism[]): string => {
       const nodeMap = new Map<string, Organism>();
       nodes.forEach(n => nodeMap.set(n.id, n));
       
       const childrenMap = new Map<string, string[]>();
       nodes.forEach(n => {
-        if (n.parentId) {
+        if (n.parentId && nodeMap.has(n.parentId)) {
           const children = childrenMap.get(n.parentId) || [];
           children.push(n.id);
           childrenMap.set(n.parentId, children);
@@ -237,16 +261,17 @@ ${t('End of Report', 'Fin del Informe')}
       return `(${roots.map(r => buildNewick(r.id)).join(',')})Life;`;
     };
 
-    const newick = toNewick(population);
+    const newick = toNewick(displayPopulation);
     const blob = new Blob([newick], { type: 'text/plain;charset=utf-8;' });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
-    link.setAttribute("download", `evolution_tree_gen_${generation}.nwk`);
+    link.setAttribute("download", `evolution_tree_gen_${newickGen}_${newickMode}.nwk`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    setShowNewickModal(false);
   };
 
   const downloadPDF = async () => {
@@ -439,17 +464,17 @@ ${t('End of Report', 'Fin del Informe')}
         </div>
 
         {/* Stats Grid */}
-        <div className="p-8 space-y-12 bg-white dark:bg-zinc-950">
-          <div className="p-8 bg-black dark:bg-zinc-900 text-white border-2 border-black dark:border-white/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="flex items-center gap-6">
-              <div className="w-12 h-12 bg-white dark:bg-zinc-800 text-black dark:text-white flex items-center justify-center border-2 border-white dark:border-white/20">
-                <Info size={24} />
+        <div className="p-10 md:p-16 space-y-20 bg-white dark:bg-zinc-950">
+          <div className="p-10 bg-black dark:bg-zinc-900 text-white border-4 border-black dark:border-white/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] dark:shadow-[12px_12px_0px_0px_rgba(255,255,255,0.1)]">
+            <div className="flex items-center gap-8">
+              <div className="w-16 h-16 bg-white dark:bg-zinc-800 text-black dark:text-white flex items-center justify-center border-2 border-white dark:border-white/20">
+                <Info size={32} />
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-70">
+                <p className="text-[10px] uppercase tracking-[0.4em] font-bold opacity-70 mb-1">
                   {t('Simulation Status', 'Estado de la Simulación')}
                 </p>
-                <h3 className="text-2xl font-bold uppercase tracking-tight font-mono">
+                <h3 className="text-3xl font-bold uppercase tracking-tight font-mono">
                   {stopReason === 'EXTINCTION' && t('Population Extinct', 'Población Extinta')}
                   {stopReason === 'COMPLETION' && t('All Challenges Survived', 'Todos los Desafíos Superados')}
                   {stopReason === 'MANUAL' && t('Simulation Terminated', 'Simulación Terminada')}
@@ -457,10 +482,10 @@ ${t('End of Report', 'Fin del Informe')}
               </div>
             </div>
             <div className="md:text-right">
-              <p className="text-[10px] uppercase tracking-[0.3em] font-bold opacity-70">
+              <p className="text-[10px] uppercase tracking-[0.4em] font-bold opacity-70 mb-1">
                 {t('Last Challenge', 'Último Desafío')}
               </p>
-              <p className="text-lg font-bold uppercase font-mono">
+              <p className="text-xl font-bold uppercase font-mono">
                 {(() => {
                   const last = getChallengeForGeneration(generation, isInfinite, challengeDuration);
                   return last ? t(last.nameEn, last.nameEs) : t('None', 'Ninguno');
@@ -470,13 +495,13 @@ ${t('End of Report', 'Fin del Informe')}
           </div>
 
           {/* Time Travel Slider */}
-          <div className="p-8 bg-zinc-100 dark:bg-zinc-900 border-2 border-black dark:border-white/20 space-y-4">
+          <div className="p-10 bg-zinc-100 dark:bg-zinc-900 border-4 border-black dark:border-white/20 space-y-6 shadow-[12px_12px_0px_0px_rgba(0,0,0,0.05)]">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-[0.3em] flex items-center gap-3">
-                <RotateCcw size={16} />
+              <h3 className="text-xs font-bold uppercase tracking-[0.4em] flex items-center gap-4">
+                <RotateCcw size={20} />
                 {t('Time Travel Explorer', 'Explorador de Viaje en el Tiempo')}
               </h3>
-              <span className="text-sm font-mono font-bold bg-black text-white px-3 py-1">
+              <span className="text-lg font-mono font-bold bg-black text-white px-4 py-2">
                 GEN {targetGeneration} / {maxGeneration}
               </span>
             </div>
@@ -486,148 +511,154 @@ ${t('End of Report', 'Fin del Informe')}
               max={maxGeneration}
               value={targetGeneration}
               onChange={(e) => setTargetGeneration(parseInt(e.target.value))}
-              className="w-full h-4 bg-zinc-300 dark:bg-zinc-700 rounded-none appearance-none cursor-pointer accent-black dark:accent-white"
+              className="w-full h-6 bg-zinc-300 dark:bg-zinc-700 rounded-none appearance-none cursor-pointer accent-black dark:accent-white border-2 border-black dark:border-white/20"
             />
-            <p className="text-[10px] uppercase font-bold opacity-60">
+            <p className="text-[11px] uppercase font-bold opacity-60 leading-relaxed max-w-2xl">
               {t('Scrub through history to view and export data from any point in the simulation.', 'Desplázate por la historia para ver y exportar datos de cualquier punto de la simulación.')}
             </p>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-0 border border-black dark:border-white/20">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((s, i) => (
-              <div key={i} className="p-8 bg-white dark:bg-zinc-900 border border-black dark:border-white/20">
-                <div className="text-black dark:text-white mb-6">{s.icon}</div>
-                <p className="text-[10px] uppercase tracking-[0.3em] text-zinc-600 dark:text-zinc-400 font-bold mb-2">{s.label}</p>
-                <p className="text-5xl font-mono font-bold tracking-tighter">{s.value}</p>
+              <div key={i} className="p-10 bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]">
+                <div className="text-black dark:text-white mb-8">{s.icon}</div>
+                <p className="text-[10px] uppercase tracking-[0.4em] text-zinc-600 dark:text-zinc-400 font-bold mb-3">{s.label}</p>
+                <p className="text-6xl font-mono font-bold tracking-tighter">{s.value}</p>
               </div>
             ))}
           </div>
 
           {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 border border-black dark:border-white/20">
-            <div className="p-8 bg-white dark:bg-zinc-900 border border-black dark:border-white/20 h-[450px] min-h-0 min-w-0">
-              <h3 className="text-xs font-bold uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
-                <Users size={16} />
+          <div className="flex flex-col gap-8">
+            <div className="p-10 bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 h-[500px] min-h-0 min-w-0 shadow-[12px_12px_0px_0px_rgba(0,0,0,0.05)]">
+              <h3 className="text-xs font-bold uppercase tracking-[0.4em] mb-10 flex items-center gap-4">
+                <Users size={20} />
                 {t('Population Dynamics', 'Dinámica de Población')}
               </h3>
-              <ResponsiveContainer width="100%" height="100%" debounce={100}>
-                <LineChart data={history}>
-                  <CartesianGrid strokeDasharray="0" stroke={theme === 'dark' ? '#333' : '#ddd'} vertical={false} />
-                  <XAxis dataKey="generation" stroke={theme === 'dark' ? '#888' : '#666'} fontSize={10} tickLine={false} axisLine={false} />
-                  <YAxis stroke={theme === 'dark' ? '#888' : '#666'} fontSize={10} tickLine={false} axisLine={false} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: theme === 'dark' ? '#18181b' : '#fff',
-                      border: theme === 'dark' ? '2px solid #3f3f46' : '2px solid #888',
-                      borderRadius: '0px',
-                      padding: '12px',
-                      fontFamily: 'monospace',
-                      color: theme === 'dark' ? '#fff' : '#000'
-                    }} 
-                  />
-                  <Line type="stepAfter" dataKey="aliveCount" stroke={theme === 'dark' ? '#fff' : '#000'} strokeWidth={3} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
+              <div className="h-[380px]">
+                <ResponsiveContainer width="100%" height="100%" debounce={100}>
+                  <LineChart data={history}>
+                    <CartesianGrid strokeDasharray="0" stroke={theme === 'dark' ? '#333' : '#ddd'} vertical={false} />
+                    <XAxis dataKey="generation" stroke={theme === 'dark' ? '#888' : '#666'} fontSize={10} tickLine={false} axisLine={false} />
+                    <YAxis stroke={theme === 'dark' ? '#888' : '#666'} fontSize={10} tickLine={false} axisLine={false} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: theme === 'dark' ? '#18181b' : '#fff',
+                        border: theme === 'dark' ? '2px solid #3f3f46' : '2px solid #888',
+                        borderRadius: '0px',
+                        padding: '12px',
+                        fontFamily: 'monospace',
+                        color: theme === 'dark' ? '#fff' : '#000'
+                      }} 
+                    />
+                    <Line type="stepAfter" dataKey="aliveCount" stroke={theme === 'dark' ? '#fff' : '#000'} strokeWidth={3} dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </div>
 
-            <div className="p-8 bg-white dark:bg-zinc-900 border border-black dark:border-white/20 h-[450px] min-h-0 min-w-0">
-              <h3 className="text-xs font-bold uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
-                <Activity size={16} />
+            <div className="p-10 bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 h-[500px] min-h-0 min-w-0 shadow-[12px_12px_0px_0px_rgba(0,0,0,0.05)]">
+              <h3 className="text-xs font-bold uppercase tracking-[0.4em] mb-10 flex items-center gap-4">
+                <Activity size={20} />
                 {t('Strategy Evolution', 'Evolución de Estrategias')}
               </h3>
-              <ResponsiveContainer width="100%" height="100%" debounce={100}>
-                <LineChart data={history}>
-                  <CartesianGrid strokeDasharray="0" stroke={theme === 'dark' ? '#222' : '#eee'} vertical={false} />
-                  <XAxis dataKey="generation" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: theme === 'dark' ? '#18181b' : '#fff',
-                      border: theme === 'dark' ? '2px solid #3f3f46' : '2px solid #888',
-                      borderRadius: '0px',
-                      padding: '12px',
-                      fontFamily: 'monospace',
-                      color: theme === 'dark' ? '#fff' : '#000'
-                    }} 
-                  />
-                  <Legend iconType="square" wrapperStyle={{ paddingTop: '20px', fontSize: '9px', textTransform: 'uppercase', fontWeight: 'bold' }} />
-                  {STRATEGIES.map((strategy, index) => (
-                    <Line 
-                      key={strategy}
-                      type="monotone" 
-                      dataKey={`strategies.${strategy}`} 
-                      name={strategy} 
-                      stroke={STRATEGY_COLORS[index % STRATEGY_COLORS.length]} 
-                      strokeWidth={2} 
-                      dot={false} 
+              <div className="h-[380px]">
+                <ResponsiveContainer width="100%" height="100%" debounce={100}>
+                  <LineChart data={history}>
+                    <CartesianGrid strokeDasharray="0" stroke={theme === 'dark' ? '#222' : '#eee'} vertical={false} />
+                    <XAxis dataKey="generation" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: theme === 'dark' ? '#18181b' : '#fff',
+                        border: theme === 'dark' ? '2px solid #3f3f46' : '2px solid #888',
+                        borderRadius: '0px',
+                        padding: '12px',
+                        fontFamily: 'monospace',
+                        color: theme === 'dark' ? '#fff' : '#000'
+                      }} 
                     />
-                  ))}
-                </LineChart>
-              </ResponsiveContainer>
+                    <Legend iconType="square" wrapperStyle={{ paddingTop: '20px', fontSize: '9px', textTransform: 'uppercase', fontWeight: 'bold' }} />
+                    {STRATEGIES.map((strategy, index) => (
+                      <Line 
+                        key={strategy}
+                        type="monotone" 
+                        dataKey={`strategies.${strategy}`} 
+                        name={strategy} 
+                        stroke={STRATEGY_COLORS[index % STRATEGY_COLORS.length]} 
+                        strokeWidth={2} 
+                        dot={false} 
+                      />
+                    ))}
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </div>
 
-            <div className="p-8 bg-white dark:bg-zinc-900 border border-black dark:border-white/20 h-[450px] min-h-0 min-w-0 lg:col-span-2">
-              <h3 className="text-xs font-bold uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
-                <TrendingUp size={16} />
+            <div className="p-10 bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 h-[500px] min-h-0 min-w-0 shadow-[12px_12px_0px_0px_rgba(0,0,0,0.05)]">
+              <h3 className="text-xs font-bold uppercase tracking-[0.4em] mb-10 flex items-center gap-4">
+                <TrendingUp size={20} />
                 {t('Diversity Indices', 'Índices de Diversidad')}
               </h3>
-              <ResponsiveContainer width="100%" height="100%" debounce={100}>
-                <LineChart data={history}>
-                  <CartesianGrid strokeDasharray="0" stroke={theme === 'dark' ? '#222' : '#eee'} vertical={false} />
-                  <XAxis dataKey="generation" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
-                  <YAxis yId="left" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
-                  <YAxis yId="right" orientation="right" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: theme === 'dark' ? '#18181b' : '#fff',
-                      border: theme === 'dark' ? '2px solid #3f3f46' : '2px solid #888',
-                      borderRadius: '0px',
-                      padding: '12px',
-                      fontFamily: 'monospace',
-                      color: theme === 'dark' ? '#fff' : '#000'
-                    }} 
-                  />
-                  <Legend iconType="square" wrapperStyle={{ paddingTop: '20px', fontSize: '9px', textTransform: 'uppercase', fontWeight: 'bold' }} />
-                  <Line 
-                    yId="left"
-                    type="monotone" 
-                    dataKey="taxonomicDiversity" 
-                    name={t('Taxonomic Diversity', 'Diversidad Taxonómica')} 
-                    stroke="#f59e0b" 
-                    strokeWidth={3} 
-                    dot={false} 
-                  />
-                  <Line 
-                    yId="right"
-                    type="monotone" 
-                    dataKey="phylogeneticDiversity" 
-                    name={t('Phylogenetic Diversity', 'Diversidad Filogenética')} 
-                    stroke="#10b981" 
-                    strokeWidth={3} 
-                    dot={false} 
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              <div className="h-[380px]">
+                <ResponsiveContainer width="100%" height="100%" debounce={100}>
+                  <LineChart data={history}>
+                    <CartesianGrid strokeDasharray="0" stroke={theme === 'dark' ? '#222' : '#eee'} vertical={false} />
+                    <XAxis dataKey="generation" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
+                    <YAxis yId="left" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
+                    <YAxis yId="right" orientation="right" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: theme === 'dark' ? '#18181b' : '#fff',
+                        border: theme === 'dark' ? '2px solid #3f3f46' : '2px solid #888',
+                        borderRadius: '0px',
+                        padding: '12px',
+                        fontFamily: 'monospace',
+                        color: theme === 'dark' ? '#fff' : '#000'
+                      }} 
+                    />
+                    <Legend iconType="square" wrapperStyle={{ paddingTop: '20px', fontSize: '9px', textTransform: 'uppercase', fontWeight: 'bold' }} />
+                    <Line 
+                      yId="left"
+                      type="monotone" 
+                      dataKey="taxonomicDiversity" 
+                      name={t('Taxonomic Diversity', 'Diversidad Taxonómica')} 
+                      stroke="#f59e0b" 
+                      strokeWidth={3} 
+                      dot={false} 
+                    />
+                    <Line 
+                      yId="right"
+                      type="monotone" 
+                      dataKey="phylogeneticDiversity" 
+                      name={t('Phylogenetic Diversity', 'Diversidad Filogenética')} 
+                      stroke="#10b981" 
+                      strokeWidth={3} 
+                      dot={false} 
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </div>
 
           {/* Trait Strategy Table */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <div className="p-8 bg-white dark:bg-zinc-900 border-2 border-black dark:border-white/20">
-              <h3 className="text-xs font-bold uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
-                <FileText size={16} />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+            <div className="p-10 bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 shadow-[12px_12px_0px_0px_rgba(0,0,0,0.05)]">
+              <h3 className="text-xs font-bold uppercase tracking-[0.4em] mb-10 flex items-center gap-4">
+                <FileText size={20} />
                 {t('Trait Strategy Guide', 'Guía de Estrategias de Rasgos')}
               </h3>
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-[10px] uppercase font-bold">
+                <table className="w-full text-left text-[11px] uppercase font-bold">
                   <thead>
-                    <tr className="border-b-2 border-black dark:border-white/20">
-                      <th className="pb-4">{t('Color', 'Color')}</th>
-                      <th className="pb-4">{t('Traits', 'Rasgos')}</th>
-                      <th className="pb-4">{t('Strategy', 'Estrategia')}</th>
+                    <tr className="border-b-4 border-black dark:border-white/20">
+                      <th className="pb-6">{t('Color', 'Color')}</th>
+                      <th className="pb-6">{t('Traits', 'Rasgos')}</th>
+                      <th className="pb-6">{t('Strategy', 'Estrategia')}</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+                  <tbody className="divide-y-2 divide-zinc-200 dark:divide-zinc-800">
                     {[
                       { color: 'bg-red-500', label: t('Red', 'Rojo'), traits: t('Size, Defense', 'Tamaño, Defensa'), strategy: t('Toughness', 'Resistencia') },
                       { color: 'bg-green-500', label: t('Green', 'Verde'), traits: t('Speed, Repro', 'Velocidad, Repro'), strategy: t('Evasion', 'Evasión') },
@@ -638,12 +669,12 @@ ${t('End of Report', 'Fin del Informe')}
                       { color: 'bg-white border border-black dark:border-white/20', label: t('White', 'Blanco'), traits: t('Balanced', 'Equilibrado'), strategy: t('Generalists', 'Generalistas') },
                     ].map((row, i) => (
                       <tr key={i}>
-                        <td className="py-4 flex items-center gap-3">
-                          <div className={cn("w-3 h-3", row.color)} />
+                        <td className="py-6 flex items-center gap-4">
+                          <div className={cn("w-4 h-4", row.color)} />
                           {row.label}
                         </td>
-                        <td className="py-4">{row.traits}</td>
-                        <td className="py-4 opacity-60">{row.strategy}</td>
+                        <td className="py-6">{row.traits}</td>
+                        <td className="py-6 opacity-60">{row.strategy}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -651,24 +682,24 @@ ${t('End of Report', 'Fin del Informe')}
               </div>
             </div>
 
-            <div className="p-8 bg-white dark:bg-zinc-900 border-2 border-black dark:border-white/20">
-              <h3 className="text-xs font-bold uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
-                <Activity size={16} />
+            <div className="p-10 bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 shadow-[12px_12px_0px_0px_rgba(0,0,0,0.05)]">
+              <h3 className="text-xs font-bold uppercase tracking-[0.4em] mb-10 flex items-center gap-4">
+                <Activity size={20} />
                 {t('Challenge History', 'Historial de Desafíos')}
               </h3>
-              <div className="space-y-6 max-h-[350px] overflow-y-auto custom-scrollbar pr-4">
+              <div className="space-y-8 max-h-[400px] overflow-y-auto custom-scrollbar pr-6">
                 {Array.from({ length: Math.ceil(generation / challengeDuration) }).map((_, i) => {
                   const gen = i * challengeDuration;
                   const challenge = getChallengeForGeneration(gen, isInfinite, challengeDuration);
                   if (!challenge) return null;
                   return (
-                    <div key={i} className="flex gap-6 items-start pb-6 border-b border-zinc-200 dark:border-zinc-800 last:border-0">
-                      <div className="px-3 py-1 bg-black dark:bg-white text-white dark:text-black text-[10px] font-mono font-bold uppercase tracking-tighter">
+                    <div key={i} className="flex gap-8 items-start pb-8 border-b-2 border-zinc-200 dark:border-zinc-800 last:border-0">
+                      <div className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black text-xs font-mono font-bold uppercase tracking-tighter">
                         GEN {gen}
                       </div>
                       <div>
-                        <p className="text-xs font-bold uppercase tracking-tight">{t(challenge.nameEn, challenge.nameEs)}</p>
-                        <p className="text-[10px] opacity-60 mt-1 leading-relaxed">{t(challenge.descriptionEn, challenge.descriptionEs)}</p>
+                        <p className="text-sm font-bold uppercase tracking-tight">{t(challenge.nameEn, challenge.nameEs)}</p>
+                        <p className="text-[11px] opacity-60 mt-2 leading-relaxed">{t(challenge.descriptionEn, challenge.descriptionEs)}</p>
                       </div>
                     </div>
                   );
@@ -678,12 +709,12 @@ ${t('End of Report', 'Fin del Informe')}
           </div>
 
           {/* Data Dictionary Section */}
-          <div className="p-10 bg-zinc-100 dark:bg-zinc-900 border-2 border-black dark:border-white/20">
-            <h3 className="text-xs font-bold uppercase tracking-[0.3em] mb-10 flex items-center gap-3">
-              <Info size={16} />
+          <div className="p-12 bg-zinc-100 dark:bg-zinc-900 border-4 border-black dark:border-white/20 shadow-[12px_12px_0px_0px_rgba(0,0,0,0.05)]">
+            <h3 className="text-xs font-bold uppercase tracking-[0.4em] mb-12 flex items-center gap-4">
+              <Info size={20} />
               {t('Data Dictionary', 'Diccionario de Datos')}
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
               {[
                 { label: t('Size', 'Tamaño'), desc: t('Physical scale. Affects food needs and thermal resistance.', 'Escala física. Afecta necesidades de comida y resistencia térmica.') },
                 { label: t('Speed', 'Velocidad'), desc: t('Movement velocity. Vital for evasion and foraging.', 'Velocidad de movimiento. Vital para evasión y búsqueda de alimento.') },
@@ -693,60 +724,145 @@ ${t('End of Report', 'Fin del Informe')}
                 { label: t('Clutch Size', 'Tamaño de Camada'), desc: t('Potential number of offspring per event (1-8).', 'Número potencial de crías por evento (1-8).') },
                 { label: t('Temp Tolerance', 'Tolerancia Temp'), desc: t('Survival in extreme climate shifts.', 'Supervivencia en cambios climáticos extremos.') },
               ].map((item, i) => (
-                <div key={i} className="space-y-2">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-black dark:text-white">{item.label}</p>
-                  <p className="text-[10px] leading-relaxed opacity-60">{item.desc}</p>
+                <div key={i} className="space-y-3">
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-black dark:text-white">{item.label}</p>
+                  <p className="text-[11px] leading-relaxed opacity-60">{item.desc}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex flex-wrap gap-4 pt-12 border-t-4 border-black dark:border-white/20">
+          <div className="flex flex-wrap gap-6 pt-16 border-t-4 border-black dark:border-white/20">
             <button 
               onClick={onRestart}
-              className="px-10 py-5 bg-black dark:bg-white text-white dark:text-black font-bold flex items-center gap-4 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all uppercase text-xs tracking-widest"
+              className="px-12 py-6 bg-black dark:bg-white text-white dark:text-black font-bold flex items-center gap-6 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all uppercase text-sm tracking-[0.2em] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.1)]"
             >
-              <RotateCcw size={20} />
+              <RotateCcw size={24} />
               {t('Start New Simulation', 'Nueva Simulación')}
             </button>
             <button 
               onClick={downloadCSV}
-              className="px-10 py-5 bg-white dark:bg-zinc-900 text-black dark:text-white border-2 border-black dark:border-white/20 font-bold flex items-center gap-4 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase text-xs tracking-widest"
+              className="px-12 py-6 bg-white dark:bg-zinc-900 text-black dark:text-white border-4 border-black dark:border-white/20 font-bold flex items-center gap-6 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase text-sm tracking-[0.2em] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]"
             >
-              <FileText size={20} />
+              <FileText size={24} />
               {t('Download CSV', 'Descargar CSV')}
             </button>
             <button 
               onClick={downloadReport}
-              className="px-10 py-5 bg-white dark:bg-zinc-900 text-black dark:text-white border-2 border-black dark:border-white/20 font-bold flex items-center gap-4 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase text-xs tracking-widest"
+              className="px-12 py-6 bg-white dark:bg-zinc-900 text-black dark:text-white border-4 border-black dark:border-white/20 font-bold flex items-center gap-6 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase text-sm tracking-[0.2em] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]"
             >
-              <Download size={20} />
+              <Download size={24} />
               {t('Download Report', 'Descargar Informe')}
             </button>
             <button 
               onClick={downloadImage}
-              className="px-10 py-5 bg-white dark:bg-zinc-900 text-black dark:text-white border-2 border-black dark:border-white/20 font-bold flex items-center gap-4 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase text-xs tracking-widest"
+              className="px-12 py-6 bg-white dark:bg-zinc-900 text-black dark:text-white border-4 border-black dark:border-white/20 font-bold flex items-center gap-6 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase text-sm tracking-[0.2em] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]"
             >
-              <ImageIcon size={20} />
+              <ImageIcon size={24} />
               {t('Save as Image', 'Guardar Imagen')}
             </button>
             <button 
-              onClick={downloadNewick}
-              className="px-10 py-5 bg-white dark:bg-zinc-900 text-black dark:text-white border-2 border-black dark:border-white/20 font-bold flex items-center gap-4 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase text-xs tracking-widest"
+              onClick={() => {
+                setNewickGen(targetGeneration);
+                setShowNewickModal(true);
+              }}
+              className="px-12 py-6 bg-white dark:bg-zinc-900 text-black dark:text-white border-4 border-black dark:border-white/20 font-bold flex items-center gap-6 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase text-sm tracking-[0.2em] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]"
             >
-              <Share2 size={20} />
+              <Share2 size={24} />
               {t('Export Newick', 'Exportar Newick')}
             </button>
             <button 
               onClick={downloadPDF}
-              className="px-10 py-5 bg-white dark:bg-zinc-900 text-black dark:text-white border-2 border-black dark:border-white/20 font-bold flex items-center gap-4 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase text-xs tracking-widest"
+              className="px-12 py-6 bg-white dark:bg-zinc-900 text-black dark:text-white border-4 border-black dark:border-white/20 font-bold flex items-center gap-6 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase text-sm tracking-[0.2em] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]"
             >
-              <FileText size={20} />
+              <FileText size={24} />
               {t('Download PDF Analysis', 'Descargar Análisis PDF')}
             </button>
           </div>
         </div>
+
+        {/* Newick Export Modal */}
+        {showNewickModal && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="w-full max-w-md bg-white dark:bg-zinc-950 border-4 border-black dark:border-white p-8 space-y-8"
+            >
+              <div className="flex justify-between items-center">
+                <h3 className="text-xl font-mono font-bold uppercase tracking-tighter">
+                  {t('Newick Export Settings', 'Ajustes de Exportación Newick')}
+                </h3>
+                <button onClick={() => setShowNewickModal(false)}>
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <label className="text-xs font-bold uppercase tracking-widest opacity-60">
+                    {t('Target Generation', 'Generación Objetivo')}
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <input 
+                      type="range" 
+                      min="0" 
+                      max={maxGeneration} 
+                      value={newickGen}
+                      onChange={(e) => setNewickGen(parseInt(e.target.value))}
+                      className="flex-1 h-2 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-black dark:accent-white"
+                    />
+                    <span className="font-mono font-bold text-xl min-w-[3ch]">{newickGen}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-xs font-bold uppercase tracking-widest opacity-60">
+                    {t('Export Mode', 'Modo de Exportación')}
+                  </label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <button 
+                      onClick={() => setNewickMode('micro')}
+                      className={cn(
+                        "py-4 border-4 font-bold uppercase text-xs tracking-widest transition-all",
+                        newickMode === 'micro' 
+                          ? "bg-black text-white dark:bg-white dark:text-black border-black dark:border-white" 
+                          : "border-black/10 dark:border-white/10 hover:border-black dark:hover:border-white"
+                      )}
+                    >
+                      {t('Micro (All)', 'Micro (Todo)')}
+                    </button>
+                    <button 
+                      onClick={() => setNewickMode('macro')}
+                      className={cn(
+                        "py-4 border-4 font-bold uppercase text-xs tracking-widest transition-all",
+                        newickMode === 'macro' 
+                          ? "bg-black text-white dark:bg-white dark:text-black border-black dark:border-white" 
+                          : "border-black/10 dark:border-white/10 hover:border-black dark:hover:border-white"
+                      )}
+                    >
+                      {t('Macro (Lineages)', 'Macro (Linajes)')}
+                    </button>
+                  </div>
+                  <p className="text-[10px] opacity-60 leading-relaxed">
+                    {newickMode === 'macro' 
+                      ? t('Only lineages with surviving descendants at the selected generation.', 'Solo linajes con descendientes vivos en la generación seleccionada.')
+                      : t('Full history of all individuals up to the selected generation.', 'Historia completa de todos los individuos hasta la generación seleccionada.')
+                    }
+                  </p>
+                </div>
+              </div>
+
+              <button 
+                onClick={downloadNewick}
+                className="w-full py-6 bg-black dark:bg-white text-white dark:text-black font-bold uppercase tracking-[0.2em] text-sm hover:opacity-90 transition-all"
+              >
+                {t('Download Newick File', 'Descargar Archivo Newick')}
+              </button>
+            </motion.div>
+          </div>
+        )}
       </motion.div>
     </motion.div>
   );
