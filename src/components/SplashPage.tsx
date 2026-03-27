@@ -377,6 +377,10 @@ const SplashPage: React.FC<SplashProps> = ({
                             <span className="font-bold text-black dark:text-white">{t('Macro View:', 'Vista Macro:')}</span>
                             {" "}{t('A high-level dashboard showing population trends, trait averages, and diversity metrics over time.', 'Un panel de alto nivel que muestra tendencias poblacionales y métricas de diversidad.')}
                           </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Time Travel:', 'Viaje en el Tiempo:')}</span>
+                            {" "}{t('Use the history slider in the Macro View or select specific nodes in the Phylogeny tree to explore the state of the simulation at any previous generation.', 'Usa el deslizador de historia en la Vista Macro o selecciona nodos en el árbol para explorar generaciones previas.')}
+                          </p>
                         </div>
                       </div>
 

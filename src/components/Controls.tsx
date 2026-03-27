@@ -45,6 +45,14 @@ const Controls: React.FC<ControlsProps> = ({
   const [activeDef, setActiveDef] = useState<string | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
+  const extraDefs: Record<string, string> = {
+    simulationMode: t('Standard: Fixed era duration. Infinite: Simulation continues indefinitely.', 'Estándar: Duración de era fija. Infinito: La simulación continúa indefinidamente.'),
+    visualQuality: t('High Res: Better graphics, higher CPU usage. Low Res: Simplified graphics for better performance.', 'Alta Res.: Mejores gráficos, mayor uso de CPU. Baja Res.: Gráficos simplificados para mejor rendimiento.'),
+    bottleneckSurvival: t('Percentage of the population that survives during mass extinction events.', 'Porcentaje de la población que sobrevive durante eventos de extinción masiva.'),
+    ecoDynamics: t('Enables functional synergy between diverse groups, increasing overall ecosystem stability.', 'Activa la sinergia funcional entre grupos diversos, aumentando la estabilidad del ecosistema.'),
+    resetSettings: t('Restore all simulation parameters to their original balanced values.', 'Restaurar todos los parámetros de simulación a sus valores originales equilibrados.')
+  };
+
   const sliders = [
     { 
       key: 'mutationRate', 
@@ -254,7 +262,7 @@ const Controls: React.FC<ControlsProps> = ({
                         onClick={() => setActiveDef(activeDef === s.key ? null : s.key)}
                         className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-black dark:text-white/70 hover:underline transition-all"
                       >
-                        {s.label} <Info size={10} />
+                        {s.label} <HelpCircle size={10} />
                       </button>
                       <span className="font-mono text-[9px] text-black dark:text-white font-bold">
                         {settings[s.key as keyof SimulationSettings]}
@@ -281,9 +289,12 @@ const Controls: React.FC<ControlsProps> = ({
                 
                 {/* Infinite Mode Toggle */}
                 <div className="space-y-1">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-black dark:text-white/70">
-                    {t('Simulation Mode', 'Modo de Simulación')}
-                  </span>
+                  <button 
+                    onClick={() => setActiveDef(activeDef === 'simulationMode' ? null : 'simulationMode')}
+                    className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-black dark:text-white/70 hover:underline transition-all"
+                  >
+                    {t('Simulation Mode', 'Modo de Simulación')} <HelpCircle size={10} />
+                  </button>
                   <button 
                     onClick={() => onSettingsChange({ ...settings, isInfinite: !settings.isInfinite })}
                     className={cn(
@@ -300,9 +311,12 @@ const Controls: React.FC<ControlsProps> = ({
 
                 {/* Resolution Toggle in Settings */}
                 <div className="space-y-1">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-black dark:text-white/70">
-                    {t('Visual Quality', 'Calidad Visual')}
-                  </span>
+                  <button 
+                    onClick={() => setActiveDef(activeDef === 'visualQuality' ? null : 'visualQuality')}
+                    className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-black dark:text-white/70 hover:underline transition-all"
+                  >
+                    {t('Visual Quality', 'Calidad Visual')} <HelpCircle size={10} />
+                  </button>
                   <button 
                     onClick={onToggleRes}
                     className={cn(
@@ -319,9 +333,12 @@ const Controls: React.FC<ControlsProps> = ({
 
                 {/* Bottleneck Survival Rate Control */}
                 <div className="space-y-1">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-black dark:text-white/70">
-                    {t('Bottleneck Survival', 'Supervivencia Cuello Botella')}
-                  </span>
+                  <button 
+                    onClick={() => setActiveDef(activeDef === 'bottleneckSurvival' ? null : 'bottleneckSurvival')}
+                    className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-black dark:text-white/70 hover:underline transition-all"
+                  >
+                    {t('Bottleneck Survival', 'Supervivencia Cuello Botella')} <HelpCircle size={10} />
+                  </button>
                   <div className="flex gap-0 border-2 border-black dark:border-white/20">
                     {[0.001, 0.01, 0.05, 0.1, 0.2, 0.5].map((rate) => (
                       <button
@@ -342,9 +359,12 @@ const Controls: React.FC<ControlsProps> = ({
 
                 {/* Eco-Dynamics Toggle */}
                 <div className="space-y-1">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-black dark:text-white/70">
-                    {t('Eco-Dynamics', 'Dinámica Eco')}
-                  </span>
+                  <button 
+                    onClick={() => setActiveDef(activeDef === 'ecoDynamics' ? null : 'ecoDynamics')}
+                    className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-black dark:text-white/70 hover:underline transition-all"
+                  >
+                    {t('Eco-Dynamics', 'Dinámica Eco')} <HelpCircle size={10} />
+                  </button>
                   <button 
                     onClick={() => onSettingsChange({ ...settings, ecoSynergy: !settings.ecoSynergy })}
                     className={cn(
@@ -361,9 +381,12 @@ const Controls: React.FC<ControlsProps> = ({
 
                 {/* Restore Defaults Button */}
                 <div className="space-y-1">
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-black dark:text-white/70">
-                    {t('Reset Settings', 'Reiniciar Ajustes')}
-                  </span>
+                  <button 
+                    onClick={() => setActiveDef(activeDef === 'resetSettings' ? null : 'resetSettings')}
+                    className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider text-black dark:text-white/70 hover:underline transition-all"
+                  >
+                    {t('Reset Settings', 'Reiniciar Ajustes')} <HelpCircle size={10} />
+                  </button>
                   <button 
                     onClick={onRestoreDefaults}
                     className="w-full flex items-center justify-center gap-2 py-2 text-[9px] font-bold uppercase transition-all border-2 border-black dark:border-white/20 bg-white text-black dark:bg-zinc-900 dark:text-white hover:bg-red-500 hover:text-white dark:hover:bg-red-600"
@@ -384,7 +407,7 @@ const Controls: React.FC<ControlsProps> = ({
                     exit={{ opacity: 0 }}
                     className="mt-4 p-2 bg-zinc-100 dark:bg-zinc-800 border-2 border-black dark:border-white/20 text-[10px] text-black dark:text-white font-mono"
                   >
-                    {sliders.find(s => s.key === activeDef)?.def}
+                    {sliders.find(s => s.key === activeDef)?.def || extraDefs[activeDef]}
                   </motion.div>
                 )}
               </AnimatePresence>
