@@ -101,10 +101,46 @@ const Controls: React.FC<ControlsProps> = ({
       def: t('Strength of functional support between diverse groups.', 'Fuerza del apoyo funcional entre grupos diversos.')
     },
     { 
-      key: 'baseOffspring', 
-      label: t('Avg. Offspring', 'Descendencia Prom.'), 
-      min: 1, max: 20, step: 1,
-      def: t('Potential number of offspring per generation.', 'Número potencial de descendientes por generación.')
+      key: 'minOffspring', 
+      label: t('Min Offspring', 'Descendencia Mín.'), 
+      min: 1, max: 10, step: 1,
+      def: t('Minimum potential number of offspring per generation.', 'Número potencial mínimo de descendientes por generación.')
+    },
+    { 
+      key: 'maxOffspring', 
+      label: t('Max Offspring', 'Descendencia Máx.'), 
+      min: 1, max: 30, step: 1,
+      def: t('Maximum potential number of offspring per generation.', 'Número potencial máximo de descendientes por generación.')
+    },
+    { 
+      key: 'sizeBias', 
+      label: t('Size Bias', 'Sesgo Tamaño'), 
+      min: -1, max: 1, step: 0.1,
+      def: t('Manually favor larger (>0) or smaller (<0) organisms.', 'Favorecer manualmente organismos más grandes (>0) o pequeños (<0).')
+    },
+    { 
+      key: 'speedBias', 
+      label: t('Speed Bias', 'Sesgo Velocidad'), 
+      min: -1, max: 1, step: 0.1,
+      def: t('Manually favor faster (>0) or slower (<0) organisms.', 'Favorecer manualmente organismos más rápidos (>0) o lentos (<0).')
+    },
+    { 
+      key: 'metabolismBias', 
+      label: t('Metabolism Bias', 'Sesgo Metab.'), 
+      min: -1, max: 1, step: 0.1,
+      def: t('Manually favor efficient (>0) or active (<0) organisms.', 'Favorecer manualmente organismos eficientes (>0) o activos (<0).')
+    },
+    { 
+      key: 'defenseBias', 
+      label: t('Defense Bias', 'Sesgo Defensa'), 
+      min: -1, max: 1, step: 0.1,
+      def: t('Manually favor protected (>0) or vulnerable (<0) organisms.', 'Favorecer manualmente organismos protegidos (>0) o vulnerables (<0).')
+    },
+    { 
+      key: 'reproductionBias', 
+      label: t('Reproduction Bias', 'Sesgo Reprod.'), 
+      min: -1, max: 1, step: 0.1,
+      def: t('Manually favor high (>0) or low (<0) reproduction rates.', 'Favorecer manualmente tasas de reproducción altas (>0) o bajas (<0).')
     },
   ];
 

@@ -82,7 +82,14 @@ export const calculateFitness = (
     reasonEs = 'Atrapado en una catástrofe repentina.';
   }
 
-  return { fitness, reasonEn, reasonEs };
+  // Manual Selection Biases (God Mode)
+  fitness += (organism.traits.size - 0.5) * settings.sizeBias * 0.5;
+  fitness += (organism.traits.speed - 0.5) * settings.speedBias * 0.5;
+  fitness += (0.5 - organism.traits.metabolism) * settings.metabolismBias * 0.5; // High metabolism is usually bad, so bias > 0 favors LOW metabolism
+  fitness += (organism.traits.defense - 0.5) * settings.defenseBias * 0.5;
+  fitness += (organism.traits.reproductionRate - 0.5) * settings.reproductionBias * 0.5;
+
+  return { fitness: Math.max(0, Math.min(1, fitness)), reasonEn, reasonEs };
 };
 
 export const runGeneration = (
@@ -159,7 +166,7 @@ export const runGeneration = (
     // clutchSize defines the number of trials (potential offspring)
     // Reproduction is throttled by overcrowding to help stabilize population size
     let numOffspring = 0;
-    const maxTrials = Math.floor(1 + org.traits.clutchSize * settings.baseOffspring); // 1 to baseOffspring+1 potential offspring
+    const maxTrials = Math.floor(settings.minOffspring + org.traits.clutchSize * (settings.maxOffspring - settings.minOffspring));
     const reproductionThrottle = 1 / (1 + overcrowdingFactor * 2);
     const p = org.traits.reproductionRate * reproductionThrottle;
     

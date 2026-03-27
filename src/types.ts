@@ -66,7 +66,13 @@ export interface SimulationSettings {
   challengeDuration: number;
   ecoSynergy: boolean;
   synergyStrength: number;
-  baseOffspring: number;
+  minOffspring: number;
+  maxOffspring: number;
+  sizeBias: number;
+  speedBias: number;
+  metabolismBias: number;
+  defenseBias: number;
+  reproductionBias: number;
 }
 
 export interface GenerationMetrics {

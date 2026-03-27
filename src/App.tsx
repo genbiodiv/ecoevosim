@@ -40,7 +40,13 @@ const INITIAL_SETTINGS: SimulationSettings = {
   challengeDuration: 10,
   ecoSynergy: true,
   synergyStrength: 0.15,
-  baseOffspring: 7,
+  minOffspring: 1,
+  maxOffspring: 8,
+  sizeBias: 0.0,
+  speedBias: 0.0,
+  metabolismBias: 0.0,
+  defenseBias: 0.0,
+  reproductionBias: 0.0,
 };
 
 export default function App() {

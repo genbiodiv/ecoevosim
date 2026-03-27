@@ -55,6 +55,27 @@ ECO EVO SIM is designed for research and education:
 - **Newick Tree Files:** Export the phylogeny in the standard Newick format used by professional bioinformatics tools.
 - **PDF Reports:** Generate a comprehensive summary of your simulation, including charts, top strategies, and evolutionary milestones.
 
+## ⚙️ Simulation Settings
+
+### 1. Simulation Mode
+- **Standard Mode:** A curated sequence of environmental challenges (e.g., "The Great Cooling", "Predator Explosion") that tests your lineage's adaptability.
+- **Infinite Mode:** Procedurally generated challenges that continue indefinitely, allowing for long-term evolutionary experiments.
+
+### 2. Visual Quality & Performance
+- **High Res:** Supports up to 3000 nodes in the phylogeny view. Provides the most detailed visual representation but requires a modern GPU/CPU.
+- **Low Res:** Optimized for performance, limiting the tree to 1000 nodes. Ideal for long-running simulations or older hardware.
+
+### 3. Population Dynamics
+- **Bottleneck Survival:** Controls the severity of population crashes when carrying capacity is exceeded. A 10% survival rate creates intense selection pressure, while 50% allows for more genetic drift.
+- **Min/Max Offspring:** Defines the range of potential descendants per reproduction event. High values lead to rapid population growth and increased mutation potential.
+
+## 📊 Dashboard Metrics
+
+- **Population:** The current count of living organisms vs. the environment's maximum capacity.
+- **Extinction Rate:** The cumulative percentage of all organisms born that have failed to survive.
+- **Generations:** The total number of evolutionary cycles (birth, selection, mutation) completed.
+- **Diversity Index:** A measure of how varied the current population's traits are. High diversity increases ecosystem resilience.
+
 ## 🎮 How to Play
 1. **Begin:** Start a new simulation from the Splash Page.
 2. **Observe:** Watch the tree grow from left to right. Circles are living; X marks are extinct.
@@ -64,3 +85,4 @@ ECO EVO SIM is designed for research and education:
 
 ---
 *Evolution is a journey of a billion small steps. Start yours today.*
+

@@ -1,10 +1,9 @@
 import React, { useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { BookOpen, Globe, Brain, CheckCircle2, Moon, Sun, Info, Monitor } from 'lucide-react';
+import { BookOpen, Globe, Brain, CheckCircle2, Moon, Sun, Info, Monitor, HelpCircle, RotateCcw, Target, LogOut, Activity, Network, Eye, LayoutDashboard, Zap, Layers } from 'lucide-react';
 import { Language } from '../types';
 import { getTraitLegend } from '../simulation/colors';
 import { cn } from '../lib/utils';
-import { Zap } from 'lucide-react';
 
 interface SplashProps {
   onStart: () => void;
@@ -122,7 +121,7 @@ const SplashPage: React.FC<SplashProps> = ({
             <div className="w-full max-w-md space-y-4">
               <div className="flex flex-col gap-2">
                 <label className="text-[10px] font-bold uppercase tracking-widest opacity-60 text-center">
-                  {t('Simulation Duration (Generations)', 'Duración de la Simulación (Generaciones)')}
+                  {t('Era Duration', 'Duración de las Eras')}
                 </label>
                 <div className="flex gap-2">
                   {[5, 10, 20, 50].map((d) => (
@@ -291,6 +290,115 @@ const SplashPage: React.FC<SplashProps> = ({
                             <span className="font-bold text-black dark:text-white">{t('Newick Export:', 'Exportación Newick:')}</span>
                             {" "}{t('Export your tree in standard format. Choose between Micro (all individuals) or Macro (only surviving lineages) modes.', 'Exporta tu árbol en formato estándar. Elige entre modo Micro o Macro.')}
                           </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <h3 className="text-xl font-bold uppercase tracking-tighter font-mono flex items-center gap-2">
+                          <Monitor size={20} className="text-emerald-500" />
+                          {t('Simulation Settings', 'Ajustes de Simulación')}
+                        </h3>
+                        <div className="space-y-4 text-sm font-mono leading-relaxed opacity-80">
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Simulation Mode:', 'Modo de Simulación:')}</span>
+                            {" "}{t('Standard mode follows a fixed set of challenges. Infinite mode generates randomized challenges for endless evolution.', 'El modo Estándar sigue desafíos fijos. El modo Infinito genera desafíos aleatorios.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Visual Quality:', 'Calidad Visual:')}</span>
+                            {" "}{t('High Res allows for more detailed trees (up to 3000 nodes) but requires more processing power. Low Res is optimized for performance.', 'Alta Res permite árboles más detallados. Baja Res está optimizada para el rendimiento.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Bottleneck Survival:', 'Supervivencia Cuello Botella:')}</span>
+                            {" "}{t('The percentage of organisms that survive when the population exceeds the carrying capacity. Lower values create stronger selection pressure.', 'El porcentaje de organismos que sobreviven al exceder la capacidad de carga.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Eco-Dynamics Toggle:', 'Activar Dinámica Eco:')}</span>
+                            {" "}{t('Enables or disables the synergy bonus. When active, a diverse population helps its members survive environmental challenges.', 'Activa o desactiva el bono de sinergia. Ayuda a sobrevivir desafíos ambientales.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Reset Settings:', 'Reiniciar Ajustes:')}</span>
+                            {" "}{t('Instantly restores all mutation, mortality, and environmental parameters to their original balanced values.', 'Restaura instantáneamente todos los parámetros a sus valores equilibrados originales.')}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <h3 className="text-xl font-bold uppercase tracking-tighter font-mono flex items-center gap-2">
+                          <Brain size={20} className="text-purple-500" />
+                          {t('Trait Selection (God Mode)', 'Selección de Rasgos (Modo Dios)')}
+                        </h3>
+                        <div className="space-y-4 text-sm font-mono leading-relaxed opacity-80">
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Trait Biases:', 'Sesgos de Rasgos:')}</span>
+                            {" "}{t('Manually influence natural selection by favoring specific biological traits. Positive values favor higher traits (e.g., larger size), while negative values favor lower ones.', 'Influye manualmente en la selección natural favoreciendo rasgos específicos.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Size/Speed/Defense:', 'Tamaño/Velocidad/Defensa:')}</span>
+                            {" "}{t('Adjust these to force the population to evolve towards specific physical characteristics regardless of environmental pressures.', 'Ajusta estos para forzar a la población a evolucionar hacia características físicas específicas.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Metabolism:', 'Metabolismo:')}</span>
+                            {" "}{t('Positive bias favors efficiency (lower metabolism), while negative bias favors high-energy activity.', 'El sesgo positivo favorece la eficiencia (menor metabolismo).')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Reproduction:', 'Reproducción:')}</span>
+                            {" "}{t('Favor organisms with higher reproduction rates to accelerate population growth and genetic variation.', 'Favorece organismos con mayores tasas de reproducción.')}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <h3 className="text-xl font-bold uppercase tracking-tighter font-mono flex items-center gap-2">
+                          <CheckCircle2 size={20} className="text-orange-500" />
+                          {t('Dashboard & Navigation', 'Panel y Navegación')}
+                        </h3>
+                        <div className="space-y-4 text-sm font-mono leading-relaxed opacity-80">
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Population:', 'Población:')}</span>
+                            {" "}{t('Displays the current number of living organisms and the environment\'s carrying capacity.', 'Muestra el número actual de organismos vivos y la capacidad de carga.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Extinction Rate:', 'Tasa de Extinción:')}</span>
+                            {" "}{t('The percentage of all organisms ever born that have died. A high rate indicates intense natural selection.', 'El porcentaje de todos los organismos nacidos que han muerto.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Generations:', 'Generaciones:')}</span>
+                            {" "}{t('The total number of evolutionary cycles completed since the simulation began.', 'El número total de ciclos evolutivos completados.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Phylogeny View:', 'Vista de Filogenia:')}</span>
+                            {" "}{t('A branching tree showing the direct relationships between ancestors and descendants.', 'Un árbol ramificado que muestra las relaciones entre ancestros y descendientes.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Population View:', 'Vista de Población:')}</span>
+                            {" "}{t('A grid view of all living individuals, allowing for direct comparison of their biological traits.', 'Una vista de cuadrícula de todos los individuos vivos para comparar sus rasgos.')}
+                          </p>
+                          <p>
+                            <span className="font-bold text-black dark:text-white">{t('Macro View:', 'Vista Macro:')}</span>
+                            {" "}{t('A high-level dashboard showing population trends, trait averages, and diversity metrics over time.', 'Un panel de alto nivel que muestra tendencias poblacionales y métricas de diversidad.')}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4 md:col-span-2">
+                        <h3 className="text-xl font-bold uppercase tracking-tighter font-mono flex items-center gap-2">
+                          <Info size={20} className="text-zinc-500" />
+                          {t('Icon Reference', 'Referencia de Iconos')}
+                        </h3>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[10px] font-mono uppercase font-bold">
+                          <div className="flex items-center gap-2"><div className="p-1 bg-black text-white dark:bg-white dark:text-black"><Zap size={12}/></div> {t('Play/Pause', 'Play/Pausa')}</div>
+                          <div className="flex items-center gap-2"><div className="p-1 bg-black text-white dark:bg-white dark:text-black"><RotateCcw size={12}/></div> {t('Reset/Return', 'Reiniciar/Volver')}</div>
+                          <div className="flex items-center gap-2"><div className="p-1 bg-black text-white dark:bg-white dark:text-black"><Target size={12}/></div> {t('Center View', 'Centrar Vista')}</div>
+                          <div className="flex items-center gap-2"><div className="p-1 bg-black text-white dark:bg-white dark:text-black"><LogOut size={12}/></div> {t('End Simulation', 'Finalizar')}</div>
+                          <div className="flex items-center gap-2"><div className="p-1 bg-black text-white dark:bg-white dark:text-black"><Monitor size={12}/></div> {t('Settings', 'Ajustes')}</div>
+                          <div className="flex items-center gap-2"><div className="p-1 bg-black text-white dark:bg-white dark:text-black"><Globe size={12}/></div> {t('Language', 'Idioma')}</div>
+                          <div className="flex items-center gap-2"><div className="p-1 bg-black text-white dark:bg-white dark:text-black"><Moon size={12}/></div> {t('Theme', 'Tema')}</div>
+                          <div className="flex items-center gap-2"><div className="p-1 bg-black text-white dark:bg-white dark:text-black"><HelpCircle size={12}/></div> {t('Manual', 'Manual')}</div>
+                          <div className="flex items-center gap-2"><div className="p-1 bg-black text-white dark:bg-white dark:text-black"><Activity size={12}/></div> {t('Status/History', 'Estado/Historia')}</div>
+                          <div className="flex items-center gap-2"><div className="p-1 bg-black text-white dark:bg-white dark:text-black"><Layers size={12}/></div> {t('Strategies', 'Estrategias')}</div>
+                          <div className="flex items-center gap-2"><div className="p-1 bg-black text-white dark:bg-white dark:text-black"><Network size={12}/></div> {t('Phylogeny', 'Filogenia')}</div>
+                          <div className="flex items-center gap-2"><div className="p-1 bg-black text-white dark:bg-white dark:text-black"><Eye size={12}/></div> {t('Population', 'Población')}</div>
+                          <div className="flex items-center gap-2"><div className="p-1 bg-black text-white dark:bg-white dark:text-black"><LayoutDashboard size={12}/></div> {t('Macro', 'Macro')}</div>
                         </div>
                       </div>
                   </div>
