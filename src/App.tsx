@@ -212,9 +212,15 @@ export default function App() {
         const newMetrics: GenerationMetrics = {
           generation: nextGen,
           aliveCount,
+          extinctCount: prunedPopulation.length - aliveCount,
           avgSize: aliveNodes.reduce((acc, o) => acc + o.traits.size, 0) / Math.max(1, aliveCount),
           avgSpeed: aliveNodes.reduce((acc, o) => acc + o.traits.speed, 0) / Math.max(1, aliveCount),
           avgMetabolism: aliveNodes.reduce((acc, o) => acc + o.traits.metabolism, 0) / Math.max(1, aliveCount),
+          avgDefense: aliveNodes.reduce((acc, o) => acc + o.traits.defense, 0) / Math.max(1, aliveCount),
+          avgReproductionRate: aliveNodes.reduce((acc, o) => acc + o.traits.reproductionRate, 0) / Math.max(1, aliveCount),
+          avgClutchSize: aliveNodes.reduce((acc, o) => acc + o.traits.clutchSize, 0) / Math.max(1, aliveCount),
+          avgTempTolerance: aliveNodes.reduce((acc, o) => acc + o.traits.tempTolerance, 0) / Math.max(1, aliveCount),
+          avgFoodSpecialization: aliveNodes.reduce((acc, o) => acc + o.traits.foodSpecialization, 0) / Math.max(1, aliveCount),
           strategies: strategyCounts,
           taxonomicDiversity,
           phylogeneticDiversity,
@@ -273,11 +279,18 @@ export default function App() {
 
   const t = (en: string, es: string) => state.language === Language.EN ? en : es;
 
-  const metrics = [
-    { icon: <Users size={16} />, label: t('Population', 'Población'), value: state.population.filter(o => o.isAlive).length, sub: `Max: ${state.settings.carryingCapacity}` },
-    { icon: <Skull size={16} />, label: t('Extinction Rate', 'Tasa de Extinción'), value: `${((state.population.filter(o => !o.isAlive).length / Math.max(1, state.population.length)) * 100).toFixed(1)}%`, sub: t('Total deaths', 'Muertes totales') },
-    { icon: <TreePine size={16} />, label: t('Generations', 'Generaciones'), value: state.generation, sub: t('Time elapsed', 'Tiempo transcurrido') },
-  ];
+  const metrics = useMemo(() => {
+    const aliveCount = state.population.filter(o => o.isAlive).length;
+    const totalCount = state.population.length;
+    const extinctCount = totalCount - aliveCount;
+    const extinctionRate = totalCount > 0 ? (extinctCount / totalCount) * 100 : 0;
+
+    return [
+      { icon: <Users size={16} />, label: t('Population', 'Población'), value: aliveCount, sub: `Max: ${state.settings.carryingCapacity}` },
+      { icon: <Skull size={16} />, label: t('Extinction Rate', 'Tasa de Extinción'), value: `${extinctionRate.toFixed(1)}%`, sub: t('Total deaths', 'Muertes totales') },
+      { icon: <TreePine size={16} />, label: t('Generations', 'Generaciones'), value: state.generation, sub: t('Time elapsed', 'Tiempo transcurrido') },
+    ];
+  }, [state.population, state.generation, state.settings.carryingCapacity, state.language]);
 
   const handleResumeFromGeneration = (gen: number) => {
     setState(prev => {

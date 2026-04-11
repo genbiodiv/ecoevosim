@@ -79,9 +79,15 @@ export interface SimulationSettings {
 export interface GenerationMetrics {
   generation: number;
   aliveCount: number;
+  extinctCount: number;
   avgSize: number;
   avgSpeed: number;
   avgMetabolism: number;
+  avgDefense: number;
+  avgReproductionRate: number;
+  avgClutchSize: number;
+  avgTempTolerance: number;
+  avgFoodSpecialization: number;
   strategies: Record<string, number>;
   taxonomicDiversity: number;
   phylogeneticDiversity: number;

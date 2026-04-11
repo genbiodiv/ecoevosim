@@ -44,35 +44,40 @@ const MacroView: React.FC<MacroViewProps> = ({ population, history, generation, 
            (!o.extinctGeneration || o.extinctGeneration > generation);
   };
 
-  const { alivePopulation, extinctCount, taxonomicDiversity, phylogeneticDiversity, strategyData, mostCommonStrategy, traitAverages } = useMemo(() => {
+  const currentMetrics = useMemo(() => {
+    return history.find(h => h.generation === generation);
+  }, [history, generation]);
+
+  const { alivePopulationCount, extinctCount, taxonomicDiversity, phylogeneticDiversity, strategyData, mostCommonStrategy, traitAverages } = useMemo(() => {
+    // If we have pre-calculated metrics for this generation, use them!
+    if (currentMetrics) {
+      const sData = STRATEGIES.map(name => ({ name, value: currentMetrics.strategies[name] || 0 }));
+      const commonStrategy = sData.reduce((prev, current) => (prev.value > current.value) ? prev : current, sData[0]).name;
+      
+      const tAverages = [
+        { name: t('Size', 'Tamaño'), value: currentMetrics.avgSize },
+        { name: t('Speed', 'Velocidad'), value: currentMetrics.avgSpeed },
+        { name: t('Metabolism', 'Metabolismo'), value: currentMetrics.avgMetabolism },
+        { name: t('Defense', 'Defensa'), value: currentMetrics.avgDefense },
+        { name: t('Repro', 'Repro'), value: currentMetrics.avgReproductionRate },
+        { name: t('Clutch', 'Camada'), value: currentMetrics.avgClutchSize },
+      ];
+
+      return {
+        alivePopulationCount: currentMetrics.aliveCount,
+        extinctCount: currentMetrics.extinctCount,
+        taxonomicDiversity: currentMetrics.taxonomicDiversity,
+        phylogeneticDiversity: currentMetrics.phylogeneticDiversity,
+        strategyData: sData,
+        mostCommonStrategy: commonStrategy,
+        traitAverages: tAverages
+      };
+    }
+
+    // Fallback for generation 0 or if metrics are missing (should be rare)
     const alivePop = population.filter(isAliveAtViewedGen);
     const extinct = population.filter(o => !isAliveAtViewedGen(o) && o.generation <= generation).length;
 
-    // Taxonomic Diversity
-    const speciesSet = new Set<string>();
-    alivePop.forEach(o => {
-      const key = `${o.traits.size.toFixed(1)}|${o.traits.speed.toFixed(1)}|${o.traits.metabolism.toFixed(1)}|${o.traits.defense.toFixed(1)}|${o.traits.reproductionRate.toFixed(1)}|${o.traits.foodSpecialization.toFixed(1)}`;
-      speciesSet.add(key);
-    });
-
-    // Phylogenetic Diversity
-    const ancestorIds = new Set<string>();
-    const popMap = new Map<string, Organism>(population.map(o => [o.id, o]));
-    alivePop.forEach(node => {
-      let current: Organism | undefined = node;
-      while (current) {
-        if (ancestorIds.has(current.id)) break;
-        ancestorIds.add(current.id);
-        if (!current.parentId) break;
-        current = popMap.get(current.parentId);
-      }
-    });
-    const pd = Array.from(ancestorIds).filter(id => {
-      const node = popMap.get(id);
-      return node && node.parentId !== null;
-    }).length;
-
-    // Strategy Analysis
     const strategies: Record<string, number> = {};
     alivePop.forEach(o => {
       const strategy = getOrganismStrategy(o.traits);
@@ -80,7 +85,9 @@ const MacroView: React.FC<MacroViewProps> = ({ population, history, generation, 
     });
 
     const sData = STRATEGIES.map(name => ({ name, value: strategies[name] || 0 }));
-    const commonStrategy = sData.reduce((prev, current) => (prev.value > current.value) ? prev : current, sData[0]).name;
+    const commonStrategy = sData.length > 0 
+      ? sData.reduce((prev, current) => (prev.value > current.value) ? prev : current, sData[0]).name
+      : 'Balanced';
 
     const tAverages = [
       { name: t('Size', 'Tamaño'), value: alivePop.length > 0 ? alivePop.reduce((a, b) => a + b.traits.size, 0) / alivePop.length : 0 },
@@ -92,20 +99,20 @@ const MacroView: React.FC<MacroViewProps> = ({ population, history, generation, 
     ];
 
     return {
-      alivePopulation: alivePop,
+      alivePopulationCount: alivePop.length,
       extinctCount: extinct,
-      taxonomicDiversity: speciesSet.size,
-      phylogeneticDiversity: pd,
+      taxonomicDiversity: 1, // Default for gen 0
+      phylogeneticDiversity: 0,
       strategyData: sData,
       mostCommonStrategy: commonStrategy,
       traitAverages: tAverages
     };
-  }, [population, generation, language]);
+  }, [population, generation, language, currentMetrics]);
 
   const stats = [
     { 
       label: t('Total Population', 'Población Total'), 
-      value: alivePopulation.length, 
+      value: alivePopulationCount, 
       icon: <Users className="text-blue-500" />,
       desc: t('Currently living organisms.', 'Organismos vivos actualmente.')
     },
