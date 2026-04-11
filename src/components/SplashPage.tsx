@@ -497,6 +497,49 @@ const SplashPage: React.FC<SplashProps> = ({
                 ))}
               </div>
             </motion.section>
+
+            {/* Learning Challenges */}
+            <motion.section 
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.6 }}
+              className="space-y-8 pb-20"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 bg-orange-500 flex items-center justify-center text-white">
+                  <Zap size={20} />
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white uppercase tracking-tight font-mono">
+                  {t('Learning Challenges', 'Desafíos de Aprendizaje')}
+                </h2>
+              </div>
+              
+              <div className="grid md:grid-cols-3 gap-8">
+                {[
+                  {
+                    title: t('The Specialist', 'El Especialista'),
+                    en: 'Can you create an environment where only very large, slow organisms survive? Try adjusting food availability and predation pressure.',
+                    es: '¿Puedes crear un entorno donde solo sobrevivan organismos muy grandes y lentos? Intenta ajustar el alimento y la presión de depredación.'
+                  },
+                  {
+                    title: t('Mass Extinction', 'Extinción Masiva'),
+                    en: 'Trigger a catastrophe and observe the "Bottleneck Effect". Which traits help organisms survive sudden environmental shifts?',
+                    es: 'Provoca una catástrofe y observa el "Efecto de Cuello de Botella". ¿Qué rasgos ayudan a sobrevivir a cambios ambientales repentinos?'
+                  },
+                  {
+                    title: t('Eco-Synergy', 'Eco-Sinergia'),
+                    en: 'Enable Eco-Dynamics and observe how diversity affects stability. Does a more diverse ecosystem resist extinction better?',
+                    es: 'Activa la Dinámica Eco y observa cómo la diversidad afecta la estabilidad. ¿Un ecosistema más diverso resiste mejor la extinción?'
+                  }
+                ].map((item, i) => (
+                  <div key={i} className="p-6 border-2 border-black dark:border-white/20 bg-zinc-50 dark:bg-zinc-900/50 space-y-4">
+                    <h4 className="font-bold text-black dark:text-white uppercase text-sm tracking-widest border-b-2 border-black dark:border-white/20 pb-2">{item.title}</h4>
+                    <p className="text-xs leading-relaxed text-black/80 dark:text-white/60 font-mono">{t(item.en, item.es)}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.section>
           </div>
         </div>
       </motion.div>

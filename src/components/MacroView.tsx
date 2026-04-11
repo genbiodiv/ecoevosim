@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'motion/react';
 import { 
   Users, 
@@ -20,23 +20,22 @@ import {
   Tooltip, 
   ResponsiveContainer,
   Cell,
-  PieChart,
-  Pie,
   LineChart,
   Line,
   Legend
 } from 'recharts';
-import { Organism, Language } from '../types';
+import { Organism, Language, GenerationMetrics } from '../types';
 import { getOrganismStrategy, STRATEGIES } from '../simulation/strategies';
 
 interface MacroViewProps {
   population: Organism[];
+  history: GenerationMetrics[];
   generation: number;
   language: Language;
   theme: 'light' | 'dark';
 }
 
-const MacroView: React.FC<MacroViewProps> = ({ population, generation, language, theme }) => {
+const MacroView: React.FC<MacroViewProps> = ({ population, history, generation, language, theme }) => {
   const t = (en: string, es: string) => language === Language.EN ? en : es;
 
   const isAliveAtViewedGen = (o: Organism) => {
@@ -45,14 +44,14 @@ const MacroView: React.FC<MacroViewProps> = ({ population, generation, language,
            (!o.extinctGeneration || o.extinctGeneration > generation);
   };
 
-  const { alivePopulation, extinctCount, taxonomicDiversity, phylogeneticDiversity, strategyData, mostCommonStrategy, traitAverages } = React.useMemo(() => {
+  const { alivePopulation, extinctCount, taxonomicDiversity, phylogeneticDiversity, strategyData, mostCommonStrategy, traitAverages } = useMemo(() => {
     const alivePop = population.filter(isAliveAtViewedGen);
     const extinct = population.filter(o => !isAliveAtViewedGen(o) && o.generation <= generation).length;
 
     // Taxonomic Diversity
     const speciesSet = new Set<string>();
     alivePop.forEach(o => {
-      const key = Object.values(o.traits).map(v => (v as number).toFixed(1)).join('|');
+      const key = `${o.traits.size.toFixed(1)}|${o.traits.speed.toFixed(1)}|${o.traits.metabolism.toFixed(1)}|${o.traits.defense.toFixed(1)}|${o.traits.reproductionRate.toFixed(1)}|${o.traits.foodSpecialization.toFixed(1)}`;
       speciesSet.add(key);
     });
 
@@ -74,24 +73,22 @@ const MacroView: React.FC<MacroViewProps> = ({ population, generation, language,
     }).length;
 
     // Strategy Analysis
-    const strategies = alivePop.reduce((acc, o) => {
+    const strategies: Record<string, number> = {};
+    alivePop.forEach(o => {
       const strategy = getOrganismStrategy(o.traits);
-      acc[strategy] = (acc[strategy] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+      strategies[strategy] = (strategies[strategy] || 0) + 1;
+    });
 
     const sData = STRATEGIES.map(name => ({ name, value: strategies[name] || 0 }));
-    const commonStrategy = sData.length > 0 
-      ? [...sData].sort((a, b) => b.value - a.value)[0].name 
-      : 'N/A';
+    const commonStrategy = sData.reduce((prev, current) => (prev.value > current.value) ? prev : current, sData[0]).name;
 
     const tAverages = [
-      { name: t('Size', 'Tamaño'), value: alivePop.reduce((a, b) => a + b.traits.size, 0) / Math.max(1, alivePop.length) },
-      { name: t('Speed', 'Velocidad'), value: alivePop.reduce((a, b) => a + b.traits.speed, 0) / Math.max(1, alivePop.length) },
-      { name: t('Metabolism', 'Metabolismo'), value: alivePop.reduce((a, b) => a + b.traits.metabolism, 0) / Math.max(1, alivePop.length) },
-      { name: t('Defense', 'Defensa'), value: alivePop.reduce((a, b) => a + b.traits.defense, 0) / Math.max(1, alivePop.length) },
-      { name: t('Repro', 'Repro'), value: alivePop.reduce((a, b) => a + b.traits.reproductionRate, 0) / Math.max(1, alivePop.length) },
-      { name: t('Clutch', 'Camada'), value: alivePop.reduce((a, b) => a + b.traits.clutchSize, 0) / Math.max(1, alivePop.length) },
+      { name: t('Size', 'Tamaño'), value: alivePop.length > 0 ? alivePop.reduce((a, b) => a + b.traits.size, 0) / alivePop.length : 0 },
+      { name: t('Speed', 'Velocidad'), value: alivePop.length > 0 ? alivePop.reduce((a, b) => a + b.traits.speed, 0) / alivePop.length : 0 },
+      { name: t('Metabolism', 'Metabolismo'), value: alivePop.length > 0 ? alivePop.reduce((a, b) => a + b.traits.metabolism, 0) / alivePop.length : 0 },
+      { name: t('Defense', 'Defensa'), value: alivePop.length > 0 ? alivePop.reduce((a, b) => a + b.traits.defense, 0) / alivePop.length : 0 },
+      { name: t('Repro', 'Repro'), value: alivePop.length > 0 ? alivePop.reduce((a, b) => a + b.traits.reproductionRate, 0) / alivePop.length : 0 },
+      { name: t('Clutch', 'Camada'), value: alivePop.length > 0 ? alivePop.reduce((a, b) => a + b.traits.clutchSize, 0) / alivePop.length : 0 },
     ];
 
     return {
@@ -173,42 +170,48 @@ const MacroView: React.FC<MacroViewProps> = ({ population, generation, language,
               <TrendingUp size={20} />
               {t('Diversity Indices', 'Índices de Diversidad')}
             </h3>
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%" debounce={100}>
-                <LineChart data={history}>
-                  <CartesianGrid strokeDasharray="0" stroke={theme === 'dark' ? '#222' : '#eee'} vertical={false} />
-                  <XAxis dataKey="generation" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
-                  <YAxis yId="left" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
-                  <YAxis yId="right" orientation="right" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: theme === 'dark' ? '#18181b' : '#fff',
-                      border: '2px solid black',
-                      borderRadius: '0px',
-                      fontFamily: 'monospace'
-                    }} 
-                  />
-                  <Legend iconType="square" wrapperStyle={{ paddingTop: '20px', fontSize: '9px', textTransform: 'uppercase', fontWeight: 'bold' }} />
-                  <Line 
-                    yId="left"
-                    type="monotone" 
-                    dataKey="taxonomicDiversity" 
-                    name={t('Taxonomic Diversity', 'Diversidad Taxonómica')} 
-                    stroke="#f59e0b" 
-                    strokeWidth={3} 
-                    dot={false} 
-                  />
-                  <Line 
-                    yId="right"
-                    type="monotone" 
-                    dataKey="phylogeneticDiversity" 
-                    name={t('Phylogenetic Diversity', 'Diversidad Filogenética')} 
-                    stroke="#10b981" 
-                    strokeWidth={3} 
-                    dot={false} 
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+            <div className="h-[300px] w-full min-h-[300px]">
+              {history.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={history}>
+                    <CartesianGrid strokeDasharray="0" stroke={theme === 'dark' ? '#222' : '#eee'} vertical={false} />
+                    <XAxis dataKey="generation" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
+                    <YAxis yAxisId="left" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
+                    <YAxis yAxisId="right" orientation="right" stroke="#888" fontSize={10} tickLine={false} axisLine={false} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: theme === 'dark' ? '#18181b' : '#fff',
+                        border: '2px solid black',
+                        borderRadius: '0px',
+                        fontFamily: 'monospace'
+                      }} 
+                    />
+                    <Legend iconType="square" wrapperStyle={{ paddingTop: '20px', fontSize: '9px', textTransform: 'uppercase', fontWeight: 'bold' }} />
+                    <Line 
+                      yAxisId="left"
+                      type="monotone" 
+                      dataKey="taxonomicDiversity" 
+                      name={t('Taxonomic Diversity', 'Diversidad Taxonómica')} 
+                      stroke="#f59e0b" 
+                      strokeWidth={3} 
+                      dot={false} 
+                    />
+                    <Line 
+                      yAxisId="right"
+                      type="monotone" 
+                      dataKey="phylogeneticDiversity" 
+                      name={t('Phylogenetic Diversity', 'Diversidad Filogenética')} 
+                      stroke="#10b981" 
+                      strokeWidth={3} 
+                      dot={false} 
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-zinc-200 dark:border-zinc-800">
+                  <p className="text-[10px] font-mono uppercase opacity-40">{t('Insufficient data for trends', 'Datos insuficientes para tendencias')}</p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -218,8 +221,8 @@ const MacroView: React.FC<MacroViewProps> = ({ population, generation, language,
               <Activity size={20} />
               {t('Average Trait Distribution', 'Distribución de Rasgos Promedio')}
             </h3>
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%" debounce={100}>
+            <div className="h-[300px] w-full min-h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={traitAverages} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#333' : '#ddd'} horizontal={false} />
                   <XAxis type="number" domain={[0, 1]} hide />
@@ -257,8 +260,8 @@ const MacroView: React.FC<MacroViewProps> = ({ population, generation, language,
               {t('Dominant Strategies', 'Estrategias Dominantes')}
             </h3>
             <div className="flex flex-col md:flex-row items-center gap-12 h-[300px]">
-              <div className="w-full md:w-2/3 h-full">
-                <ResponsiveContainer width="100%" height="100%" debounce={100}>
+              <div className="w-full md:w-2/3 h-full min-h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={strategyData} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#333' : '#ddd'} horizontal={false} />
                     <XAxis type="number" hide />

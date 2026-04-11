@@ -150,6 +150,12 @@ const Controls: React.FC<ControlsProps> = ({
       min: -1, max: 1, step: 0.1,
       def: t('Manually favor high (>0) or low (<0) reproduction rates.', 'Favorecer manualmente tasas de reproducción altas (>0) o bajas (<0).')
     },
+    { 
+      key: 'simulationSpeed', 
+      label: t('Gen. Delay (ms)', 'Retraso Gen. (ms)'), 
+      min: 0, max: 2000, step: 50,
+      def: t('Time delay between each generation step. Lower is faster.', 'Retraso de tiempo entre cada paso de generación. Menor es más rápido.')
+    },
   ];
 
   return (

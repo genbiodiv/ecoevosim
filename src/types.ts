@@ -73,6 +73,7 @@ export interface SimulationSettings {
   metabolismBias: number;
   defenseBias: number;
   reproductionBias: number;
+  simulationSpeed: number; // Delay between generations in ms
 }
 
 export interface GenerationMetrics {
@@ -84,6 +85,7 @@ export interface GenerationMetrics {
   strategies: Record<string, number>;
   taxonomicDiversity: number;
   phylogeneticDiversity: number;
+  environment: Environment;
 }
 
 export enum StrategyType {

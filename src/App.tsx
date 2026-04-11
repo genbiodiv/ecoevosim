@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useDragControls } from 'motion/react';
 import { 
   Organism,
   SimulationState, 
   Language, 
   SimulationSettings, 
   Environment,
-  SimulationView
+  SimulationView,
+  GenerationMetrics
 } from './types';
 import { 
   createInitialOrganism, 
@@ -23,7 +24,7 @@ import MacroView from './components/MacroView';
 import EvaluationPanel from './components/EvaluationPanel';
 import StrategyShiftModal from './components/StrategyShiftModal';
 import { getTraitLegend } from './simulation/colors';
-import { Layers, Activity, TreePine, Skull, Users, Eye, Network, Info, LayoutDashboard, X, RotateCcw } from 'lucide-react';
+import { Layers, Activity, TreePine, Skull, Users, Eye, Network, Info, LayoutDashboard, X, RotateCcw, Minus, Maximize } from 'lucide-react';
 import { cn } from './lib/utils';
 
 const INITIAL_SETTINGS: SimulationSettings = {
@@ -47,6 +48,7 @@ const INITIAL_SETTINGS: SimulationSettings = {
   metabolismBias: 0.0,
   defenseBias: 0.0,
   reproductionBias: 0.0,
+  simulationSpeed: 1000,
 };
 
 export default function App() {
@@ -207,7 +209,7 @@ export default function App() {
           return node && node.parentId !== null;
         }).length;
 
-        const newMetrics = {
+        const newMetrics: GenerationMetrics = {
           generation: nextGen,
           aliveCount,
           avgSize: aliveNodes.reduce((acc, o) => acc + o.traits.size, 0) / Math.max(1, aliveCount),
@@ -216,6 +218,7 @@ export default function App() {
           strategies: strategyCounts,
           taxonomicDiversity,
           phylogeneticDiversity,
+          environment: nextEnv,
         };
 
         if (aliveCount === 0 && nextPopulation.length > 0) {
@@ -246,17 +249,27 @@ export default function App() {
       });
 
       if (isActive) {
-        timeoutId = setTimeout(tick, 1000);
+        timeoutId = setTimeout(tick, state.settings.simulationSpeed);
       }
     };
 
-    timeoutId = setTimeout(tick, 1000);
+    timeoutId = setTimeout(tick, state.settings.simulationSpeed);
 
     return () => {
       isActive = false;
       clearTimeout(timeoutId);
     };
-  }, [state.isPaused, showSplash, state.isGameOver, isHighRes]);
+  }, [state.isPaused, showSplash, state.isGameOver, isHighRes, state.settings.simulationSpeed]);
+
+  const [isTimeTravelMinimized, setIsTimeTravelMinimized] = useState(false);
+  const [isTimeTravelClosed, setIsTimeTravelClosed] = useState(false);
+
+  // Reset closed state when simulation pauses/ends
+  useEffect(() => {
+    if (state.isPaused || state.isGameOver || state.isSimulationComplete) {
+      setIsTimeTravelClosed(false);
+    }
+  }, [state.isPaused, state.isGameOver, state.isSimulationComplete]);
 
   const t = (en: string, es: string) => state.language === Language.EN ? en : es;
 
@@ -265,6 +278,63 @@ export default function App() {
     { icon: <Skull size={16} />, label: t('Extinction Rate', 'Tasa de Extinción'), value: `${((state.population.filter(o => !o.isAlive).length / Math.max(1, state.population.length)) * 100).toFixed(1)}%`, sub: t('Total deaths', 'Muertes totales') },
     { icon: <TreePine size={16} />, label: t('Generations', 'Generaciones'), value: state.generation, sub: t('Time elapsed', 'Tiempo transcurrido') },
   ];
+
+  const handleResumeFromGeneration = (gen: number) => {
+    setState(prev => {
+      const metricsAtGen = prev.history.find(h => h.generation === gen);
+      
+      // If resuming to generation 0, use initial environment values
+      const restoredEnv = gen === 0 ? {
+        temperature: 0,
+        foodAvailability: prev.settings.foodAvailability,
+        predationPressure: prev.settings.predationPressure,
+        instability: prev.settings.instability,
+      } : (metricsAtGen ? metricsAtGen.environment : prev.environment);
+      
+      const newHistory = prev.history.filter(h => h.generation <= gen);
+      const populationToKeep = prev.population.filter(o => o.generation <= gen);
+      const validIds = new Set(populationToKeep.map(o => o.id));
+
+      const newPopulation = populationToKeep.map(o => {
+        // If it's from the generation we are resuming to, it must be alive and have no children yet
+        if (o.generation === gen) {
+          return { 
+            ...o, 
+            isAlive: true, 
+            extinctGeneration: undefined, 
+            children: [],
+            survivalReasonEn: undefined,
+            survivalReasonEs: undefined,
+            challengeId: undefined
+          };
+        }
+        // For older generations, they remain as they were (dead after reproduction)
+        // but we ensure their children list only contains organisms that still exist in the new population
+        return {
+          ...o,
+          children: o.children.filter(childId => validIds.has(childId))
+        };
+      });
+
+      return {
+        ...prev,
+        generation: gen,
+        viewedGeneration: gen,
+        population: newPopulation,
+        history: newHistory,
+        environment: restoredEnv,
+        isPaused: true,
+        isGameOver: false,
+        isSimulationComplete: false,
+        stopReason: null,
+        lastShiftGen: -1,
+        isExtinctionAlertDismissed: false,
+        isLargeTreeWarningDismissed: false,
+        selectedNodeId: null,
+        pendingStrategyShift: false,
+      };
+    });
+  };
 
   const handleRestart = () => {
     setState({
@@ -305,6 +375,8 @@ export default function App() {
 
   const viewedPopulation = useMemo(() => {
     if (state.viewedGeneration === state.generation) return state.population;
+    // For past generations, we want to see the state of the world at that time.
+    // An organism is "present" in the history if it was born at or before viewedGeneration.
     return state.population.filter(o => o.generation <= state.viewedGeneration);
   }, [state.population, state.viewedGeneration, state.generation]);
 
@@ -323,6 +395,8 @@ export default function App() {
       document.documentElement.classList.remove('dark');
     }
   }, [state.theme]);
+
+  const dragControls = useDragControls();
 
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden bg-transparent transition-colors duration-300">
@@ -635,6 +709,7 @@ export default function App() {
           ) : (
             <MacroView
               population={viewedPopulation}
+              history={viewedHistory}
               generation={state.viewedGeneration}
               language={state.language}
               theme={state.theme}
@@ -685,15 +760,22 @@ export default function App() {
 
         {/* Time Travel Slider Overlay */}
         <AnimatePresence>
-          {(state.isPaused || state.isGameOver || state.isSimulationComplete) && state.generation > 0 && (
+          {(state.isPaused || state.isGameOver || state.isSimulationComplete) && state.generation > 0 && !isTimeTravelClosed && (
             <motion.div
               initial={{ y: 100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 100, opacity: 0 }}
+              drag
+              dragControls={dragControls}
+              dragListener={false}
+              dragMomentum={false}
               className="absolute bottom-24 left-1/2 -translate-x-1/2 z-40 w-full max-w-2xl px-6"
             >
               <div className="bg-white dark:bg-zinc-900 border-4 border-black dark:border-white p-6 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] dark:shadow-[12px_12px_0px_0px_rgba(255,255,255,0.1)]">
-                <div className="flex items-center justify-between mb-4">
+                <div 
+                  onPointerDown={(e) => dragControls.start(e)}
+                  className="flex items-center justify-between mb-4 cursor-move select-none border-b-2 border-black dark:border-white/20 pb-2"
+                >
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-black dark:bg-white text-white dark:text-black">
                       <RotateCcw size={16} className="animate-spin-slow" />
@@ -702,41 +784,79 @@ export default function App() {
                       {t('Time Travel Explorer', 'Explorador de Viaje Temporal')}
                     </h3>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="text-[8px] uppercase font-bold opacity-50">{t('Viewing', 'Viendo')}</p>
-                      <p className="text-xl font-mono font-black">GEN {state.viewedGeneration}</p>
-                    </div>
+                  <div className="flex items-center gap-2">
                     <button 
-                      onClick={() => setState(s => ({ ...s, viewedGeneration: s.generation }))}
-                      disabled={state.viewedGeneration === state.generation}
-                      className={cn(
-                        "px-4 py-2 border-2 border-black dark:border-white font-mono font-bold text-[10px] uppercase transition-all",
-                        state.viewedGeneration === state.generation
-                          ? "opacity-30 grayscale cursor-not-allowed"
-                          : "bg-black text-white dark:bg-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200"
-                      )}
+                      onClick={() => setIsTimeTravelMinimized(!isTimeTravelMinimized)}
+                      className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 border-2 border-black dark:border-white transition-colors"
+                      title={isTimeTravelMinimized ? t('Expand', 'Expandir') : t('Minimize', 'Minimizar')}
                     >
-                      {t('Return to Present', 'Volver al Presente')}
+                      {isTimeTravelMinimized ? <Maximize size={14} /> : <Minus size={14} />}
+                    </button>
+                    <button 
+                      onClick={() => setIsTimeTravelClosed(true)}
+                      className="p-1 hover:bg-red-500 hover:text-white border-2 border-black dark:border-white transition-colors"
+                      title={t('Close', 'Cerrar')}
+                    >
+                      <X size={14} />
                     </button>
                   </div>
                 </div>
-                
-                <div className="relative h-12 flex items-center">
-                  <input 
-                    type="range"
-                    min={0}
-                    max={state.generation}
-                    step={1}
-                    value={state.viewedGeneration}
-                    onChange={(e) => setState(s => ({ ...s, viewedGeneration: parseInt(e.target.value) }))}
-                    className="w-full h-2 bg-zinc-200 dark:bg-zinc-800 appearance-none cursor-pointer accent-black dark:accent-white border-2 border-black dark:border-white/20"
-                  />
-                  <div className="absolute -bottom-2 left-0 right-0 flex justify-between px-1">
-                    <span className="text-[8px] font-mono font-bold opacity-40">GEN 0</span>
-                    <span className="text-[8px] font-mono font-bold opacity-40">GEN {state.generation}</span>
-                  </div>
-                </div>
+
+                <AnimatePresence>
+                  {!isTimeTravelMinimized && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="text-left">
+                          <p className="text-[8px] uppercase font-bold opacity-50">{t('Viewing', 'Viendo')}</p>
+                          <p className="text-xl font-mono font-black">GEN {state.viewedGeneration}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button 
+                            onClick={() => setState(s => ({ ...s, viewedGeneration: s.generation }))}
+                            disabled={state.viewedGeneration === state.generation}
+                            className={cn(
+                              "px-4 py-2 border-2 border-black dark:border-white font-mono font-bold text-[10px] uppercase transition-all",
+                              state.viewedGeneration === state.generation
+                                ? "opacity-30 grayscale cursor-not-allowed"
+                                : "bg-zinc-100 dark:bg-zinc-800 text-black dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                            )}
+                          >
+                            {t('Return to Present', 'Volver al Presente')}
+                          </button>
+                          {state.viewedGeneration < state.generation && (
+                            <button 
+                              onClick={() => handleResumeFromGeneration(state.viewedGeneration)}
+                              className="px-4 py-2 bg-black text-white dark:bg-white dark:text-black border-2 border-black dark:border-white font-mono font-bold text-[10px] uppercase hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all"
+                            >
+                              {t('Resume from here', 'Reanudar desde aquí')}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="relative h-12 flex items-center">
+                        <input 
+                          type="range"
+                          min={0}
+                          max={state.generation}
+                          step={1}
+                          value={state.viewedGeneration}
+                          onChange={(e) => setState(s => ({ ...s, viewedGeneration: parseInt(e.target.value) }))}
+                          className="w-full h-2 bg-zinc-200 dark:bg-zinc-800 appearance-none cursor-pointer accent-black dark:accent-white border-2 border-black dark:border-white/20"
+                        />
+                        <div className="absolute -bottom-2 left-0 right-0 flex justify-between px-1">
+                          <span className="text-[8px] font-mono font-bold opacity-40">GEN 0</span>
+                          <span className="text-[8px] font-mono font-bold opacity-40">GEN {state.generation}</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </motion.div>
           )}

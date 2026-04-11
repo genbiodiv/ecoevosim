@@ -50,8 +50,14 @@ const TreeVisualization: React.FC<TreeProps> = ({
 
     let displayPopulation = population;
 
+    const isAliveAtViewedGen = (o: Organism) => {
+      if (viewedGeneration === o.generation) return o.isAlive;
+      return o.generation <= viewedGeneration && 
+             (!o.extinctGeneration || o.extinctGeneration > viewedGeneration);
+    };
+
     if (isMacroView) {
-      const aliveIds = new Set<string>(population.filter(o => o.isAlive).map(o => o.id));
+      const aliveIds = new Set<string>(population.filter(isAliveAtViewedGen).map(o => o.id));
       const hasLivingDescendant = new Set<string>();
       const idToParent = new Map<string, string | null>();
       population.forEach(o => idToParent.set(o.id, o.parentId));
@@ -65,9 +71,9 @@ const TreeVisualization: React.FC<TreeProps> = ({
           current = parentId || null;
         }
       });
-      displayPopulation = population.filter(o => o.isAlive || hasLivingDescendant.has(o.id));
+      displayPopulation = population.filter(o => isAliveAtViewedGen(o) || hasLivingDescendant.has(o.id));
     } else if (hideExtinct) {
-      displayPopulation = population.filter(o => o.isAlive);
+      displayPopulation = population.filter(isAliveAtViewedGen);
     }
 
     if (displayPopulation.length === 0) return { descendants: [] as d3.HierarchyPointNode<Organism>[], links: [] as d3.HierarchyPointLink<Organism>[], virtualRootId: "VIRTUAL_ROOT" };
@@ -118,7 +124,7 @@ const TreeVisualization: React.FC<TreeProps> = ({
       console.error("Tree stratification failed", e);
       return { descendants: [] as d3.HierarchyPointNode<Organism>[], links: [] as d3.HierarchyPointLink<Organism>[], virtualRootId: vRootId };
     }
-  }, [population, isMacroView, hideExtinct, isHighRes, hScale, vScale]);
+  }, [population, isMacroView, hideExtinct, isHighRes, hScale, vScale, viewedGeneration]);
 
   // Handle population changes for auto-fitting
   useEffect(() => {
