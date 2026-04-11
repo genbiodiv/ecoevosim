@@ -390,18 +390,18 @@ ${t('End of Report', 'Fin del Informe')}
           ref={panelRef}
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="w-full max-w-5xl h-full md:h-auto md:max-h-[90vh] overflow-y-auto flex flex-col border-4 bg-white dark:bg-zinc-950 border-black dark:border-white/20 text-black dark:text-white custom-scrollbar"
+          className="w-full max-w-5xl h-full md:h-auto md:max-h-[95vh] overflow-y-auto flex flex-col border-4 bg-white dark:bg-zinc-950 border-black dark:border-white/20 text-black dark:text-white custom-scrollbar"
         >
         {/* Header */}
-        <div className="p-8 border-b-4 border-black dark:border-white/20 flex items-center justify-between sticky top-0 bg-inherit z-10">
+        <div className="p-4 md:p-6 border-b-4 border-black dark:border-white/20 flex items-center justify-between sticky top-0 bg-inherit z-10">
           <div>
-            <h2 className="text-3xl font-mono font-bold uppercase tracking-tighter">
+            <h2 className="text-xl md:text-2xl font-mono font-bold uppercase tracking-tighter">
               {isExtinction 
                 ? t('Evolutionary Post-Mortem', 'Análisis Evolutivo')
                 : t('Evolutionary Summary', 'Resumen Evolutivo')
               }
             </h2>
-            <p className="text-zinc-500 dark:text-zinc-400 text-xs uppercase tracking-widest mt-2 font-bold">
+            <p className="text-zinc-500 dark:text-zinc-400 text-[10px] uppercase tracking-widest mt-1 font-bold">
               {isExtinction
                 ? t('The journey of life has reached its conclusion.', 'El viaje de la vida ha llegado a su fin.')
                 : t('The lineage has successfully navigated all challenges.', 'El linaje ha navegado con éxito todos los desafíos.')
@@ -410,33 +410,33 @@ ${t('End of Report', 'Fin del Informe')}
           </div>
           <button 
             onClick={onClose}
-            className="p-4 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black border-2 border-black dark:border-white transition-colors"
+            className="p-2 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black border-2 border-black dark:border-white transition-colors"
           >
-            <X size={24} />
+            <X size={20} />
           </button>
         </div>
 
         {/* Time Travel Slider */}
-        <div className="p-8 bg-zinc-100 dark:bg-zinc-900 border-b-4 border-black dark:border-white/10">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-black dark:bg-white text-white dark:text-black">
-                <RotateCcw size={20} className="animate-spin-slow" />
+        <div className="p-4 md:p-6 bg-zinc-100 dark:bg-zinc-900 border-b-4 border-black dark:border-white/10">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-black dark:bg-white text-white dark:text-black">
+                <RotateCcw size={16} className="animate-spin-slow" />
               </div>
               <div>
-                <h3 className="text-sm font-mono font-black uppercase tracking-tighter">
+                <h3 className="text-xs font-mono font-black uppercase tracking-tighter">
                   {t('Historical Analysis', 'Análisis Histórico')}
                 </h3>
-                <p className="text-[10px] font-bold opacity-50 uppercase tracking-widest">
+                <p className="text-[9px] font-bold opacity-50 uppercase tracking-widest">
                   {t('View simulation state at any generation', 'Ver estado de la simulación en cualquier generación')}
                 </p>
               </div>
             </div>
             <div className="flex-1 w-full max-w-xl">
-              <div className="flex justify-between mb-2">
-                <span className="text-[10px] font-mono font-bold opacity-40 uppercase">GEN 0</span>
-                <span className="text-xl font-mono font-black">GEN {targetGeneration}</span>
-                <span className="text-[10px] font-mono font-bold opacity-40 uppercase">GEN {maxGeneration}</span>
+              <div className="flex justify-between mb-1">
+                <span className="text-[9px] font-mono font-bold opacity-40 uppercase">GEN 0</span>
+                <span className="text-lg font-mono font-black">GEN {targetGeneration}</span>
+                <span className="text-[9px] font-mono font-bold opacity-40 uppercase">GEN {maxGeneration}</span>
               </div>
               <input 
                 type="range"
@@ -445,14 +445,14 @@ ${t('End of Report', 'Fin del Informe')}
                 step={1}
                 value={targetGeneration}
                 onChange={handleSliderChange}
-                className="w-full h-2 bg-zinc-300 dark:bg-zinc-800 appearance-none cursor-pointer accent-black dark:accent-white border-2 border-black dark:border-white/20"
+                className="w-full h-1.5 bg-zinc-300 dark:bg-zinc-800 appearance-none cursor-pointer accent-black dark:accent-white border-2 border-black dark:border-white/20"
               />
             </div>
             <button 
               onClick={() => setTargetGeneration(maxGeneration)}
               disabled={targetGeneration === maxGeneration}
               className={cn(
-                "px-6 py-3 border-2 border-black dark:border-white font-mono font-bold text-xs uppercase transition-all",
+                "px-4 py-2 border-2 border-black dark:border-white font-mono font-bold text-[10px] uppercase transition-all",
                 targetGeneration === maxGeneration
                   ? "opacity-30 grayscale cursor-not-allowed"
                   : "bg-black text-white dark:bg-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200"
@@ -464,17 +464,17 @@ ${t('End of Report', 'Fin del Informe')}
         </div>
 
         {/* Stats Grid */}
-        <div className="p-10 md:p-16 space-y-20 bg-white dark:bg-zinc-950">
-          <div className="p-10 bg-black dark:bg-zinc-900 text-white border-4 border-black dark:border-white/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] dark:shadow-[12px_12px_0px_0px_rgba(255,255,255,0.1)]">
-            <div className="flex items-center gap-8">
-              <div className="w-16 h-16 bg-white dark:bg-zinc-800 text-black dark:text-white flex items-center justify-center border-2 border-white dark:border-white/20">
-                <Info size={32} />
+        <div className="p-6 md:p-8 space-y-10 bg-white dark:bg-zinc-950">
+          <div className="p-6 bg-black dark:bg-zinc-900 text-white border-4 border-black dark:border-white/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.1)]">
+            <div className="flex items-center gap-6">
+              <div className="w-12 h-12 bg-white dark:bg-zinc-800 text-black dark:text-white flex items-center justify-center border-2 border-white dark:border-white/20">
+                <Info size={24} />
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-[0.4em] font-bold opacity-70 mb-1">
+                <p className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-70 mb-0.5">
                   {t('Simulation Status', 'Estado de la Simulación')}
                 </p>
-                <h3 className="text-3xl font-bold uppercase tracking-tight font-mono">
+                <h3 className="text-xl font-bold uppercase tracking-tight font-mono">
                   {stopReason === 'EXTINCTION' && t('Population Extinct', 'Población Extinta')}
                   {stopReason === 'COMPLETION' && t('All Challenges Survived', 'Todos los Desafíos Superados')}
                   {stopReason === 'MANUAL' && t('Simulation Terminated', 'Simulación Terminada')}
@@ -482,10 +482,10 @@ ${t('End of Report', 'Fin del Informe')}
               </div>
             </div>
             <div className="md:text-right">
-              <p className="text-[10px] uppercase tracking-[0.4em] font-bold opacity-70 mb-1">
+              <p className="text-[9px] uppercase tracking-[0.4em] font-bold opacity-70 mb-0.5">
                 {t('Last Challenge', 'Último Desafío')}
               </p>
-              <p className="text-xl font-bold uppercase font-mono">
+              <p className="text-lg font-bold uppercase font-mono">
                 {(() => {
                   const last = getChallengeForGeneration(generation, isInfinite, challengeDuration);
                   return last ? t(last.nameEn, last.nameEs) : t('None', 'Ninguno');
@@ -518,12 +518,12 @@ ${t('End of Report', 'Fin del Informe')}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {stats.map((s, i) => (
-              <div key={i} className="p-10 bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]">
-                <div className="text-black dark:text-white mb-8">{s.icon}</div>
-                <p className="text-[10px] uppercase tracking-[0.4em] text-zinc-600 dark:text-zinc-400 font-bold mb-3">{s.label}</p>
-                <p className="text-6xl font-mono font-bold tracking-tighter">{s.value}</p>
+              <div key={i} className="p-6 bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 shadow-[6px_6px_0px_0px_rgba(0,0,0,0.05)]">
+                <div className="text-black dark:text-white mb-4 scale-75 origin-left">{s.icon}</div>
+                <p className="text-[9px] uppercase tracking-[0.4em] text-zinc-600 dark:text-zinc-400 font-bold mb-1">{s.label}</p>
+                <p className="text-4xl font-mono font-bold tracking-tighter">{s.value}</p>
               </div>
             ))}
           </div>
@@ -557,12 +557,12 @@ ${t('End of Report', 'Fin del Informe')}
               </div>
             </div>
 
-            <div className="p-10 bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 h-[500px] min-h-0 min-w-0 shadow-[12px_12px_0px_0px_rgba(0,0,0,0.05)]">
-              <h3 className="text-xs font-bold uppercase tracking-[0.4em] mb-10 flex items-center gap-4">
-                <Activity size={20} />
+            <div className="p-6 bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 h-[350px] min-h-0 min-w-0 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] mb-6 flex items-center gap-3">
+                <Activity size={16} />
                 {t('Strategy Evolution', 'Evolución de Estrategias')}
               </h3>
-              <div className="h-[380px]">
+              <div className="h-[250px]">
                 <ResponsiveContainer width="100%" height="100%" debounce={100}>
                   <LineChart data={history}>
                     <CartesianGrid strokeDasharray="0" stroke={theme === 'dark' ? '#222' : '#eee'} vertical={false} />
@@ -595,12 +595,12 @@ ${t('End of Report', 'Fin del Informe')}
               </div>
             </div>
 
-            <div className="p-10 bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 h-[500px] min-h-0 min-w-0 shadow-[12px_12px_0px_0px_rgba(0,0,0,0.05)]">
-              <h3 className="text-xs font-bold uppercase tracking-[0.4em] mb-10 flex items-center gap-4">
-                <TrendingUp size={20} />
+            <div className="p-6 bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 h-[350px] min-h-0 min-w-0 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] mb-6 flex items-center gap-3">
+                <TrendingUp size={16} />
                 {t('Diversity Indices', 'Índices de Diversidad')}
               </h3>
-              <div className="h-[380px]">
+              <div className="h-[250px]">
                 <ResponsiveContainer width="100%" height="100%" debounce={100}>
                   <LineChart data={history}>
                     <CartesianGrid strokeDasharray="0" stroke={theme === 'dark' ? '#222' : '#eee'} vertical={false} />
@@ -643,19 +643,19 @@ ${t('End of Report', 'Fin del Informe')}
           </div>
 
           {/* Trait Strategy Table */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            <div className="p-10 bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 shadow-[12px_12px_0px_0px_rgba(0,0,0,0.05)]">
-              <h3 className="text-xs font-bold uppercase tracking-[0.4em] mb-10 flex items-center gap-4">
-                <FileText size={20} />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="p-6 bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] mb-6 flex items-center gap-3">
+                <FileText size={16} />
                 {t('Trait Strategy Guide', 'Guía de Estrategias de Rasgos')}
               </h3>
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-[11px] uppercase font-bold">
+                <table className="w-full text-left text-[9px] uppercase font-bold">
                   <thead>
                     <tr className="border-b-4 border-black dark:border-white/20">
-                      <th className="pb-6">{t('Color', 'Color')}</th>
-                      <th className="pb-6">{t('Traits', 'Rasgos')}</th>
-                      <th className="pb-6">{t('Strategy', 'Estrategia')}</th>
+                      <th className="pb-4">{t('Color', 'Color')}</th>
+                      <th className="pb-4">{t('Traits', 'Rasgos')}</th>
+                      <th className="pb-4">{t('Strategy', 'Estrategia')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y-2 divide-zinc-200 dark:divide-zinc-800">
@@ -669,12 +669,12 @@ ${t('End of Report', 'Fin del Informe')}
                       { color: 'bg-white border border-black dark:border-white/20', label: t('White', 'Blanco'), traits: t('Balanced', 'Equilibrado'), strategy: t('Generalists', 'Generalistas') },
                     ].map((row, i) => (
                       <tr key={i}>
-                        <td className="py-6 flex items-center gap-4">
-                          <div className={cn("w-4 h-4", row.color)} />
+                        <td className="py-4 flex items-center gap-3">
+                          <div className={cn("w-3 h-3", row.color)} />
                           {row.label}
                         </td>
-                        <td className="py-6">{row.traits}</td>
-                        <td className="py-6 opacity-60">{row.strategy}</td>
+                        <td className="py-4">{row.traits}</td>
+                        <td className="py-4 opacity-60">{row.strategy}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -682,24 +682,24 @@ ${t('End of Report', 'Fin del Informe')}
               </div>
             </div>
 
-            <div className="p-10 bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 shadow-[12px_12px_0px_0px_rgba(0,0,0,0.05)]">
-              <h3 className="text-xs font-bold uppercase tracking-[0.4em] mb-10 flex items-center gap-4">
-                <Activity size={20} />
+            <div className="p-6 bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] mb-6 flex items-center gap-3">
+                <Activity size={16} />
                 {t('Challenge History', 'Historial de Desafíos')}
               </h3>
-              <div className="space-y-8 max-h-[400px] overflow-y-auto custom-scrollbar pr-6">
+              <div className="space-y-6 max-h-[300px] overflow-y-auto custom-scrollbar pr-4">
                 {Array.from({ length: Math.ceil(generation / challengeDuration) }).map((_, i) => {
                   const gen = i * challengeDuration;
                   const challenge = getChallengeForGeneration(gen, isInfinite, challengeDuration);
                   if (!challenge) return null;
                   return (
-                    <div key={i} className="flex gap-8 items-start pb-8 border-b-2 border-zinc-200 dark:border-zinc-800 last:border-0">
-                      <div className="px-4 py-2 bg-black dark:bg-white text-white dark:text-black text-xs font-mono font-bold uppercase tracking-tighter">
+                    <div key={i} className="flex gap-6 items-start pb-6 border-b-2 border-zinc-200 dark:border-zinc-800 last:border-0">
+                      <div className="px-3 py-1 bg-black dark:bg-white text-white dark:text-black text-[9px] font-mono font-bold uppercase tracking-tighter">
                         GEN {gen}
                       </div>
                       <div>
-                        <p className="text-sm font-bold uppercase tracking-tight">{t(challenge.nameEn, challenge.nameEs)}</p>
-                        <p className="text-[11px] opacity-60 mt-2 leading-relaxed">{t(challenge.descriptionEn, challenge.descriptionEs)}</p>
+                        <p className="text-xs font-bold uppercase tracking-tight">{t(challenge.nameEn, challenge.nameEs)}</p>
+                        <p className="text-[10px] opacity-60 mt-1 leading-relaxed">{t(challenge.descriptionEn, challenge.descriptionEs)}</p>
                       </div>
                     </div>
                   );
@@ -709,12 +709,12 @@ ${t('End of Report', 'Fin del Informe')}
           </div>
 
           {/* Data Dictionary Section */}
-          <div className="p-12 bg-zinc-100 dark:bg-zinc-900 border-4 border-black dark:border-white/20 shadow-[12px_12px_0px_0px_rgba(0,0,0,0.05)]">
-            <h3 className="text-xs font-bold uppercase tracking-[0.4em] mb-12 flex items-center gap-4">
-              <Info size={20} />
+          <div className="p-8 bg-zinc-100 dark:bg-zinc-900 border-4 border-black dark:border-white/20 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]">
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] mb-8 flex items-center gap-3">
+              <Info size={16} />
               {t('Data Dictionary', 'Diccionario de Datos')}
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[
                 { label: t('Size', 'Tamaño'), desc: t('Physical scale. Affects food needs and thermal resistance.', 'Escala física. Afecta necesidades de comida y resistencia térmica.') },
                 { label: t('Speed', 'Velocidad'), desc: t('Movement velocity. Vital for evasion and foraging.', 'Velocidad de movimiento. Vital para evasión y búsqueda de alimento.') },
@@ -724,42 +724,42 @@ ${t('End of Report', 'Fin del Informe')}
                 { label: t('Clutch Size', 'Tamaño de Camada'), desc: t('Potential number of offspring per event (1-8).', 'Número potencial de crías por evento (1-8).') },
                 { label: t('Temp Tolerance', 'Tolerancia Temp'), desc: t('Survival in extreme climate shifts.', 'Supervivencia en cambios climáticos extremos.') },
               ].map((item, i) => (
-                <div key={i} className="space-y-3">
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-black dark:text-white">{item.label}</p>
-                  <p className="text-[11px] leading-relaxed opacity-60">{item.desc}</p>
+                <div key={i} className="space-y-2">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-black dark:text-white">{item.label}</p>
+                  <p className="text-[10px] leading-relaxed opacity-60">{item.desc}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex flex-wrap gap-6 pt-16 border-t-4 border-black dark:border-white/20">
+          <div className="flex flex-wrap gap-4 pt-10 border-t-4 border-black dark:border-white/20">
             <button 
               onClick={onRestart}
-              className="px-12 py-6 bg-black dark:bg-white text-white dark:text-black font-bold flex items-center gap-6 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all uppercase text-sm tracking-[0.2em] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] dark:shadow-[8px_8px_0px_0px_rgba(255,255,255,0.1)]"
+              className="px-8 py-4 bg-black dark:bg-white text-white dark:text-black font-bold flex items-center gap-4 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all uppercase text-xs tracking-[0.2em] shadow-[6px_6px_0px_0px_rgba(0,0,0,0.2)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,0.1)]"
             >
-              <RotateCcw size={24} />
+              <RotateCcw size={20} />
               {t('Start New Simulation', 'Nueva Simulación')}
             </button>
             <button 
               onClick={downloadCSV}
-              className="px-12 py-6 bg-white dark:bg-zinc-900 text-black dark:text-white border-4 border-black dark:border-white/20 font-bold flex items-center gap-6 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase text-sm tracking-[0.2em] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]"
+              className="px-8 py-4 bg-white dark:bg-zinc-900 text-black dark:text-white border-4 border-black dark:border-white/20 font-bold flex items-center gap-4 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase text-xs tracking-[0.2em] shadow-[6px_6px_0px_0px_rgba(0,0,0,0.05)]"
             >
-              <FileText size={24} />
+              <FileText size={20} />
               {t('Download CSV', 'Descargar CSV')}
             </button>
             <button 
               onClick={downloadReport}
-              className="px-12 py-6 bg-white dark:bg-zinc-900 text-black dark:text-white border-4 border-black dark:border-white/20 font-bold flex items-center gap-6 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase text-sm tracking-[0.2em] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]"
+              className="px-8 py-4 bg-white dark:bg-zinc-900 text-black dark:text-white border-4 border-black dark:border-white/20 font-bold flex items-center gap-4 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase text-xs tracking-[0.2em] shadow-[6px_6px_0px_0px_rgba(0,0,0,0.05)]"
             >
-              <Download size={24} />
+              <Download size={20} />
               {t('Download Report', 'Descargar Informe')}
             </button>
             <button 
               onClick={downloadImage}
-              className="px-12 py-6 bg-white dark:bg-zinc-900 text-black dark:text-white border-4 border-black dark:border-white/20 font-bold flex items-center gap-6 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase text-sm tracking-[0.2em] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]"
+              className="px-8 py-4 bg-white dark:bg-zinc-900 text-black dark:text-white border-4 border-black dark:border-white/20 font-bold flex items-center gap-4 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase text-xs tracking-[0.2em] shadow-[6px_6px_0px_0px_rgba(0,0,0,0.05)]"
             >
-              <ImageIcon size={24} />
+              <ImageIcon size={20} />
               {t('Save as Image', 'Guardar Imagen')}
             </button>
             <button 
@@ -767,16 +767,16 @@ ${t('End of Report', 'Fin del Informe')}
                 setNewickGen(targetGeneration);
                 setShowNewickModal(true);
               }}
-              className="px-12 py-6 bg-white dark:bg-zinc-900 text-black dark:text-white border-4 border-black dark:border-white/20 font-bold flex items-center gap-6 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase text-sm tracking-[0.2em] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]"
+              className="px-8 py-4 bg-white dark:bg-zinc-900 text-black dark:text-white border-4 border-black dark:border-white/20 font-bold flex items-center gap-4 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase text-xs tracking-[0.2em] shadow-[6px_6px_0px_0px_rgba(0,0,0,0.05)]"
             >
-              <Share2 size={24} />
+              <Share2 size={20} />
               {t('Export Newick', 'Exportar Newick')}
             </button>
             <button 
               onClick={downloadPDF}
-              className="px-12 py-6 bg-white dark:bg-zinc-900 text-black dark:text-white border-4 border-black dark:border-white/20 font-bold flex items-center gap-6 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase text-sm tracking-[0.2em] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]"
+              className="px-8 py-4 bg-white dark:bg-zinc-900 text-black dark:text-white border-4 border-black dark:border-white/20 font-bold flex items-center gap-4 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all uppercase text-xs tracking-[0.2em] shadow-[6px_6px_0px_0px_rgba(0,0,0,0.05)]"
             >
-              <FileText size={24} />
+              <FileText size={20} />
               {t('Download PDF Analysis', 'Descargar Análisis PDF')}
             </button>
           </div>

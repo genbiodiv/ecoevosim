@@ -64,28 +64,28 @@ const PopulationView: React.FC<PopulationViewProps> = ({
   ];
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar scroll-smooth bg-transparent text-black dark:text-white">
-      <div className="max-w-7xl mx-auto space-y-12">
+    <div className="flex-1 overflow-y-auto p-2 md:p-4 custom-scrollbar scroll-smooth bg-transparent text-black dark:text-white">
+      <div className="max-w-7xl mx-auto space-y-6">
         <section className="relative">
-          <div className="sticky top-0 z-20 bg-inherit py-4 mb-6 border-b-2 border-black dark:border-white/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="sticky top-0 z-20 bg-inherit py-2 mb-4 border-b-2 border-black dark:border-white/20 flex flex-col md:flex-row md:items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-emerald-600 rounded-full animate-pulse" />
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-black dark:text-white">
+              <div className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-pulse" />
+              <h3 className="text-[9px] font-bold uppercase tracking-[0.2em] text-black dark:text-white">
                 {t('Distinct Species', 'Especies Distintas')} ({distinctList.length})
               </h3>
             </div>
 
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
-              <div className="flex items-center gap-1.5 text-black dark:text-white mr-2">
-                <SortAsc size={12} />
-                <span className="text-[9px] font-bold uppercase tracking-wider">{t('Sort By', 'Ordenar por')}</span>
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 no-scrollbar">
+              <div className="flex items-center gap-1 text-black dark:text-white mr-1">
+                <SortAsc size={10} />
+                <span className="text-[8px] font-bold uppercase tracking-wider">{t('Sort By', 'Ordenar por')}</span>
               </div>
               {sortOptions.map((opt) => (
                 <button
                   key={opt.key}
                   onClick={() => setSortBy(opt.key)}
                   className={cn(
-                    "px-3 py-1.5 text-[9px] font-bold uppercase tracking-wider transition-all border-2 whitespace-nowrap",
+                    "px-2 py-1 text-[8px] font-bold uppercase tracking-wider transition-all border-2 whitespace-nowrap",
                     sortBy === opt.key
                       ? "bg-black text-white border-black dark:bg-white dark:text-black dark:border-white"
                       : "bg-white text-black border-black dark:bg-zinc-900 dark:text-white dark:border-white/20 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black"

@@ -456,19 +456,19 @@ export default function App() {
 
       <main className="flex-1 relative flex flex-col overflow-hidden">
         {/* Top Dashboard - Minimalist & High Contrast */}
-        <div className="px-2 py-1 z-10">
-            <div className="bg-white dark:bg-zinc-900 text-black dark:text-white flex flex-wrap items-center justify-around md:justify-between px-2 md:px-4 py-1 border-2 border-black dark:border-white/20 gap-2 md:gap-4">
+        <div className="px-2 py-0.5 z-10">
+            <div className="bg-white dark:bg-zinc-900 text-black dark:text-white flex flex-wrap items-center justify-around md:justify-between px-2 md:px-4 py-0.5 border-2 border-black dark:border-white/20 gap-1 md:gap-3">
               {metrics.map((m, i) => (
                 <React.Fragment key={i}>
-                  <div className="flex items-center gap-2">
-                    <div className="text-black dark:text-white shrink-0 scale-75 md:scale-100">
+                  <div className="flex items-center gap-1.5">
+                    <div className="text-black dark:text-white shrink-0 scale-75 md:scale-90">
                       {m.icon}
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-[7px] uppercase tracking-wider opacity-80 font-bold leading-none mb-0.5">{m.label}</span>
+                      <span className="text-[6px] uppercase tracking-wider opacity-80 font-bold leading-none mb-0.5">{m.label}</span>
                       <div className="flex items-baseline gap-1">
-                        <span className="text-sm font-mono font-bold leading-none">{m.value}</span>
-                        {m.sub && <span className="text-[7px] opacity-50 font-medium hidden lg:inline truncate max-w-[80px]">{m.sub}</span>}
+                        <span className="text-xs font-mono font-bold leading-none">{m.value}</span>
+                        {m.sub && <span className="text-[6px] opacity-50 font-medium hidden lg:inline truncate max-w-[80px]">{m.sub}</span>}
                       </div>
                     </div>
                   </div>

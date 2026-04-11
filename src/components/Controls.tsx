@@ -161,47 +161,47 @@ const Controls: React.FC<ControlsProps> = ({
   return (
     <div className="w-full bg-white dark:bg-zinc-900 border-b-2 border-black dark:border-white/20 flex flex-col z-50 transition-colors">
       {/* Top Bar - Always Visible */}
-      <div className="px-4 sm:px-6 py-2 flex items-center justify-between gap-2 sm:gap-4">
-        <div className="flex items-center gap-2 sm:gap-4">
+      <div className="px-3 sm:px-4 py-1 flex items-center justify-between gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button 
             onClick={onEndSimulation}
-            className="text-sm sm:text-base font-mono font-bold text-black dark:text-white whitespace-nowrap hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black px-2 py-1 transition-colors border-2 border-transparent hover:border-black dark:hover:border-white"
+            className="text-xs sm:text-sm font-mono font-black text-black dark:text-white whitespace-nowrap hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black px-2 py-0.5 transition-colors border-2 border-transparent hover:border-black dark:hover:border-white"
           >
             ECO EVO SIM
           </button>
-          <div className="h-5 w-px bg-black dark:bg-white/20 hidden md:block" />
+          <div className="h-4 w-px bg-black dark:bg-white/20 hidden md:block" />
           <div className="flex gap-0 border-2 border-black dark:border-white/20">
             <button 
               onClick={onTogglePause} 
               className={cn(
-                "p-2 transition-all", 
+                "p-1.5 transition-all", 
                 isPaused 
                   ? "bg-black text-white dark:bg-white dark:text-black" 
                   : "bg-white text-black dark:bg-zinc-900 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800"
               )}
             >
-              {isPaused ? <Play size={14} fill="currentColor" /> : <Pause size={14} fill="currentColor" />}
+              {isPaused ? <Play size={12} fill="currentColor" /> : <Pause size={12} fill="currentColor" />}
             </button>
             <button 
               onClick={onReset} 
               title={t('Reset Simulation', 'Reiniciar')} 
-              className="p-2 bg-white dark:bg-zinc-900 text-black dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 border-l-2 border-black dark:border-white/20"
+              className="p-1.5 bg-white dark:bg-zinc-900 text-black dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 border-l-2 border-black dark:border-white/20"
             >
-              <RotateCcw size={14} />
+              <RotateCcw size={12} />
             </button>
             <button 
               onClick={onCenterView} 
               title={t('Center View', 'Centrar')} 
-              className="p-2 bg-white dark:bg-zinc-900 text-black dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 border-l-2 border-black dark:border-white/20"
+              className="p-1.5 bg-white dark:bg-zinc-900 text-black dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 border-l-2 border-black dark:border-white/20"
             >
-              <Target size={14} />
+              <Target size={12} />
             </button>
             <button 
               onClick={onEndSimulation} 
               title={t('End Simulation', 'Finalizar')} 
-              className="p-2 bg-white dark:bg-zinc-900 text-black dark:text-white hover:bg-red-500 hover:text-white border-l-2 border-black dark:border-white/20"
+              className="p-1.5 bg-white dark:bg-zinc-900 text-black dark:text-white hover:bg-red-500 hover:text-white border-l-2 border-black dark:border-white/20"
             >
-              <LogOut size={14} />
+              <LogOut size={12} />
             </button>
           </div>
 
@@ -224,27 +224,27 @@ const Controls: React.FC<ControlsProps> = ({
           <button 
             onClick={() => setIsSettingsOpen(!isSettingsOpen)}
             className={cn(
-              "px-3 py-2 text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-2 border-2 border-black dark:border-white/20",
+              "px-2 py-1.5 text-[9px] font-bold uppercase tracking-wider transition-all flex items-center gap-2 border-2 border-black dark:border-white/20",
               isSettingsOpen 
                 ? "bg-black text-white dark:bg-white dark:text-black" 
                 : "bg-white text-black dark:bg-zinc-900 dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800"
             )}
           >
-            <Monitor size={12} />
+            <Monitor size={10} />
             <span className="hidden xs:inline">{t('Settings', 'Ajustes')}</span>
           </button>
           
-          <div className="h-5 w-px bg-black dark:bg-white/20 mx-1 hidden sm:block" />
+          <div className="h-4 w-px bg-black dark:bg-white/20 mx-0.5 hidden sm:block" />
           
           <div className="flex items-center gap-0 border-2 border-black dark:border-white/20">
-            <button onClick={onToggleLanguage} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-black dark:text-white" title={t('Language', 'Idioma')}>
-              <Languages size={14} />
+            <button onClick={onToggleLanguage} className="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-black dark:text-white" title={t('Language', 'Idioma')}>
+              <Languages size={12} />
             </button>
-            <button onClick={onToggleTheme} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-black dark:text-white border-l-2 border-black dark:border-white/20" title={t('Theme', 'Tema')}>
-              {theme === 'light' ? <Sun size={14} /> : <Moon size={14} />}
+            <button onClick={onToggleTheme} className="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-black dark:text-white border-l-2 border-black dark:border-white/20" title={t('Theme', 'Tema')}>
+              {theme === 'light' ? <Sun size={12} /> : <Moon size={12} />}
             </button>
-            <button onClick={onShowHelp} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-black dark:text-white border-l-2 border-black dark:border-white/20" title={t('Gameplay Instructions', 'Instrucciones')}>
-              <HelpCircle size={14} />
+            <button onClick={onShowHelp} className="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-black dark:text-white border-l-2 border-black dark:border-white/20" title={t('Gameplay Instructions', 'Instrucciones')}>
+              <HelpCircle size={12} />
             </button>
           </div>
         </div>
@@ -259,8 +259,8 @@ const Controls: React.FC<ControlsProps> = ({
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden border-t-2 border-black dark:border-white/20"
           >
-            <div className="px-4 py-3 bg-white dark:bg-zinc-900 max-h-[80vh] overflow-y-auto custom-scrollbar">
-              <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-9 gap-x-3 gap-y-2">
+            <div className="px-4 py-2 bg-white dark:bg-zinc-900 max-h-[80vh] overflow-y-auto custom-scrollbar">
+              <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-9 gap-x-2 gap-y-1.5">
                 {sliders.map((s) => (
                   <div key={s.key} className="space-y-1">
                     <div className="flex items-center justify-between">

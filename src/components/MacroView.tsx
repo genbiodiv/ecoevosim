@@ -139,45 +139,45 @@ const MacroView: React.FC<MacroViewProps> = ({ population, history, generation, 
   const COLORS = ['#3b82f6', '#22c55e', '#ef4444', '#a855f7', '#f59e0b', '#06b6d4'];
 
   return (
-    <div className="w-full h-full overflow-y-auto bg-zinc-50 dark:bg-zinc-950 p-4 md:p-6 custom-scrollbar">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="w-full h-full overflow-y-auto bg-zinc-50 dark:bg-zinc-950 p-2 md:p-4 custom-scrollbar">
+      <div className="max-w-7xl mx-auto space-y-4">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b-4 border-black dark:border-white/20 pb-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-2 border-b-4 border-black dark:border-white/20 pb-2">
           <div>
-            <h1 className="text-4xl font-mono font-black uppercase tracking-tighter leading-none">
+            <h1 className="text-2xl font-mono font-black uppercase tracking-tighter leading-none">
               {t('Macro Analysis', 'Análisis Macro')}
             </h1>
-            <p className="text-zinc-500 dark:text-zinc-400 text-[9px] uppercase tracking-[0.4em] font-bold mt-2">
+            <p className="text-zinc-500 dark:text-zinc-400 text-[7px] uppercase tracking-[0.4em] font-bold mt-1">
               {t('System-wide evolutionary metrics', 'Métricas evolutivas del sistema')}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-[8px] uppercase tracking-widest font-bold opacity-50">{t('Current Generation', 'Generación Actual')}</p>
-            <p className="text-3xl font-mono font-black italic">GEN {generation}</p>
+            <p className="text-[7px] uppercase tracking-widest font-bold opacity-50">{t('Current Generation', 'Generación Actual')}</p>
+            <p className="text-xl font-mono font-black italic">GEN {generation}</p>
           </div>
         </div>
 
         {/* Key Metrics Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-0 border-2 border-black dark:border-white/20">
           {stats.map((s, i) => (
-            <div key={i} className="p-4 md:p-6 bg-white dark:bg-zinc-900 border border-black dark:border-white/10 group hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all">
-              <div className="mb-3 scale-75 origin-left">{s.icon}</div>
-              <p className="text-[8px] uppercase tracking-[0.3em] font-bold opacity-60 mb-1">{s.label}</p>
-              <p className="text-3xl font-mono font-bold tracking-tighter mb-2">{s.value}</p>
-              <p className="text-[8px] uppercase font-bold opacity-40 group-hover:opacity-80">{s.desc}</p>
+            <div key={i} className="p-3 md:p-4 bg-white dark:bg-zinc-900 border border-black dark:border-white/10 group hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all">
+              <div className="mb-2 scale-75 origin-left">{s.icon}</div>
+              <p className="text-[7px] uppercase tracking-[0.3em] font-bold opacity-60 mb-0.5">{s.label}</p>
+              <p className="text-xl font-mono font-bold tracking-tighter mb-1">{s.value}</p>
+              <p className="text-[7px] uppercase font-bold opacity-40 group-hover:opacity-80">{s.desc}</p>
             </div>
           ))}
         </div>
 
         {/* Charts Section */}
-        <div className="grid grid-cols-1 gap-12">
+        <div className="grid grid-cols-1 gap-6">
           {/* Diversity Indices (New) */}
-          <div className="bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 p-6 md:p-10 shadow-[12px_12px_0px_0px_rgba(0,0,0,0.05)]">
-            <h3 className="text-xs font-bold uppercase tracking-[0.4em] mb-10 flex items-center gap-4">
-              <TrendingUp size={20} />
+          <div className="bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 p-4 md:p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]">
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] mb-6 flex items-center gap-3">
+              <TrendingUp size={16} />
               {t('Diversity Indices', 'Índices de Diversidad')}
             </h3>
-            <div className="h-[300px] w-full min-h-[300px]">
+            <div className="h-[250px] w-full min-h-[250px]">
               {history.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={history}>
@@ -223,12 +223,12 @@ const MacroView: React.FC<MacroViewProps> = ({ population, history, generation, 
           </div>
 
           {/* Trait Distribution */}
-          <div className="bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 p-6 md:p-10 shadow-[12px_12px_0px_0px_rgba(0,0,0,0.05)]">
-            <h3 className="text-xs font-bold uppercase tracking-[0.4em] mb-10 flex items-center gap-4">
-              <Activity size={20} />
+          <div className="bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 p-4 md:p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]">
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] mb-6 flex items-center gap-3">
+              <Activity size={16} />
               {t('Average Trait Distribution', 'Distribución de Rasgos Promedio')}
             </h3>
-            <div className="h-[300px] w-full min-h-[300px]">
+            <div className="h-[250px] w-full min-h-[250px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={traitAverages} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#333' : '#ddd'} horizontal={false} />
@@ -261,13 +261,13 @@ const MacroView: React.FC<MacroViewProps> = ({ population, history, generation, 
           </div>
 
           {/* Strategy Bars */}
-          <div className="bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 p-6 md:p-10 shadow-[12px_12px_0px_0px_rgba(0,0,0,0.05)]">
-            <h3 className="text-xs font-bold uppercase tracking-[0.4em] mb-10 flex items-center gap-4">
-              <Zap size={20} />
+          <div className="bg-white dark:bg-zinc-900 border-4 border-black dark:border-white/20 p-4 md:p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.05)]">
+            <h3 className="text-[10px] font-bold uppercase tracking-[0.4em] mb-6 flex items-center gap-3">
+              <Zap size={16} />
               {t('Dominant Strategies', 'Estrategias Dominantes')}
             </h3>
-            <div className="flex flex-col md:flex-row items-center gap-12 h-[300px]">
-              <div className="w-full md:w-2/3 h-full min-h-[300px]">
+            <div className="flex flex-col md:flex-row items-center gap-6 h-[250px]">
+              <div className="w-full md:w-2/3 h-full min-h-[250px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={strategyData} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#333' : '#ddd'} horizontal={false} />
@@ -317,22 +317,22 @@ const MacroView: React.FC<MacroViewProps> = ({ population, history, generation, 
         </div>
 
         {/* Strategy Breakdown */}
-        <div className="bg-black dark:bg-zinc-900 text-white p-6 md:p-8 border-4 border-black dark:border-white/20">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="p-2 bg-white text-black border-2 border-white">
-              <Info size={24} />
+        <div className="bg-black dark:bg-zinc-900 text-white p-4 md:p-6 border-4 border-black dark:border-white/20">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-1.5 bg-white text-black border-2 border-white">
+              <Info size={18} />
             </div>
             <div>
-              <h2 className="text-xl font-mono font-black uppercase tracking-tighter">
+              <h2 className="text-lg font-mono font-black uppercase tracking-tighter">
                 {t('Strategy Insights', 'Perspectivas de Estrategia')}
               </h2>
-              <p className="text-zinc-400 text-[8px] uppercase tracking-[0.3em] font-bold mt-1">
+              <p className="text-zinc-400 text-[7px] uppercase tracking-[0.3em] font-bold mt-0.5">
                 {t('How your population is adapting to the current environment', 'Cómo se adapta tu población al entorno actual')}
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-blue-400">
                 <Maximize size={16} />
